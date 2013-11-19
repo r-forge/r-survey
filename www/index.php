@@ -45,6 +45,10 @@ echo $contents; } ?>
 
 <p> No content added. </p>
 
+<ul>
+<li> <a href="survey/index.html">survey</a> package web page
+<li> <a href="svybook/index.html">Complex Surveys: a guide to analysis using R</a> webpage
+</ul>
 <p> The <strong>project summary page</strong> you can find <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>. </p>
 
 </body>

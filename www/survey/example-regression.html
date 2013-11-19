@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Regression models</title>
+  </head>
+
+  <body>
+    <h1>Regression models</h1>
+
+Generalized linear models, including the linear model, are estimated
+by <a
+href="html/svyglm.html"><tt>svyglm</tt></a>.
+This has almost the same arguments as <tt>glm</tt>, the difference being 
+that the <tt>data</tt> argument to <tt>glm</tt> is replaced by a 
+<tt>design</tt> argument to <tt>svyglm</tt>. Similarly, <a 
+href="html/svycoxph.html">svycoxph</a> 
+fits Cox models to survey data.<p>
+
+In this example we use the <tt>dclus2</tt> two-stage cluster sample from the California Academic Performance Index, which was <a href="example-design.html">created in an earlier example</tt></a>.  The syntax and options for <tt>svyglm</tt> are the same for designs with and without replicate weights.<p>
+
+The outcome variable is 2000 API, predicted by the proportions of students learning English (<tt>ell</tt>), receiving subsidized means  (<tt>means</tt>) and having moved to the school within the past year (<tt>mobility</tt>).  This is a linear regression model, so no <tt>family</tt> argument to <tt>svyglm</tt> is needed.
+<pre>
+ > summary(svyglm(api00 ~ ell + meals + mobility, design = dclus2))
+
+ Call:
+ svyglm.survey.design(formula = api00 ~ ell + meals + mobility,
+     design = dclus2)
+
+ Survey design:
+ svydesign(id = ~dnum + snum, weights = ~pw, data = apiclus2)
+
+ Coefficients:
+             Estimate Std. Error t value Pr(>|t|)
+ (Intercept) 811.4907    30.8795  26.279   <2e-16 ***
+ ell          -2.0592     1.4075  -1.463    0.146
+ meals        -1.7772     1.1053  -1.608    0.110
+ mobility      0.3253     0.5305   0.613    0.541
+ ---
+ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+ (Dispersion parameter for gaussian family taken to be 8296.727)
+
+ Number of Fisher Scoring iterations: 2
+</pre>
+</P>
+
+A useful property of regression models is that they provide another way to get domain estimates.  Suppose we want the mean of <tt>api00</tt> for each school type:
+<pre>
+ >  summary(svyglm(api00~stype-1, dclus2))
+
+ Call:
+ svyglm.survey.design(formula = api00 ~ stype - 1, design = dclus2)
+
+ Survey design:
+ svydesign(id = ~dnum + snum, weights = ~pw, data = apiclus2)
+
+ Coefficients:
+        Estimate Std. Error t value Pr(>|t|)
+ stypeE   692.81      30.28   22.88   <2e-16 ***
+ stypeH   598.34      16.96   35.27   <2e-16 ***
+ stypeM   642.35      45.34   14.17   <2e-16 ***
+ ---
+ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+ 
+ (Dispersion parameter for gaussian family taken to be 17389.33)
+
+ Number of Fisher Scoring iterations: 2
+
+ > svyby(~api00,~stype,dclus2,svymean, keep.var=TRUE)
+   stype statistic.api00       SE
+ E     E        692.8104 30.28244
+ H     H        598.3407 16.96500
+ M     M        642.3520 45.34363
+</pre>
+This equivalence helps in thinking about domain estimators and how they handle more complex designs.
+
+    <hr>
+    <address><a href="mailto:tlumley@u.washington.edu">Thomas Lumley</a></address>
+<!-- Created: Tue Apr 19 09:43:00 PDT 2005 -->
+<!-- hhmts start -->
+Last modified: Mon Jun 13 15:43:36 PDT 2005
+<!-- hhmts end -->
+  </body>
+</html>
