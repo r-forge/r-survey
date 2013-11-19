@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Domain estimators</title>
+  </head>
+
+  <body>
+    <h1>Domain estimators</h1>
+
+Estimating a statistic in a subpopulation with a complex survey sample requires some care, and the resulting standard errors do not depend only on data in the subpopulation.  The survey package takes care of all these details transparently, so it is valid simply to take a subset of a survey design object.</p>
+
+Here we again use the <a href="example-design.html">dclus1</a> and <a href="example-svrepdesign.html">rclus1</a> design objects created in earlier examples.  We want to estimate the total number of students in schools that met their "school-wide growth" and "comparable improvement" targets
+<pre>
+ > svytotal(~enroll, subset(dclus1, sch.wide=="Yes" & comp.imp=="Yes"))
+          total     SE
+ enroll 2406420 645444
+ > svytotal(~enroll, subset(rclus1, sch.wide=="Yes" & comp.imp=="Yes"))
+          total     SE
+ enroll 2406420 645444
+</pre></p>
+
+Often we want estimates in a set of subpopulations, and <a href="html/svyby.html">svyby</a> will do this. The first argument gives the analysis variables. The second gives the variables that specify subpopulations. The third is the survey design object and the fourth is the analysis function. Any other arguments are passed to the analysis function (eg <tt>quantiles=0.5</tt> in the second example below).
+<pre>
+ > svyby(~api99, ~stype, dclus1, svymean)
+   stype statistic
+ E     E  607.7917
+ H     H  595.7143
+ M     M  608.6000
+ > svyby(~api99, ~stype, dclus1, svyquantile, quantiles=0.5)
+   stype statistic
+ E     E       615
+ H     H       593
+ M     M       611
+</pre></p>
+
+As this example shows, the default is not to give standard errors. This is overridden with the argument <tt>keep.var=TRUE</tt>
+<pre>
+> svyby(~api99+api00, ~stype+sch.wide, dclus1, svymean, keep.var=TRUE)
+      stype sch.wide statistic.api99 statistic.api00      SE1      SE2
+E.No      E       No        601.6667        596.3333 47.27582 43.49010
+E.Yes     E      Yes        608.3485        653.6439 21.52493 20.31720
+H.No      H       No        662.0000        659.3333 29.23003 27.00275
+H.Yes     H      Yes        577.6364        607.4545 46.50125 43.70468
+M.No      M       No        611.3750        606.3750 41.11886 41.11686
+M.Yes     M      Yes        607.2941        643.2353 42.53046 42.12850
+</pre>
+Here we have two subpopulation variables that jointly define six subpopulations, and the 1999 and 2000 API means, together with their standard errors, are reported in each subpopulation.</p>
+
+As usual, the same syntax can be used for objects with replicate weights. Here we estimate the total enrollment for each type of school (elementary, middle, high) and give the design effect
+<pre>
+> svyby(~enroll,~stype, rclus1,svytotal, deff=TRUE)
+  stype statistic.enroll       DEff
+E     E        2109717.1 125.913474
+H     H         535594.9   5.003186
+M     M         759628.1  13.557221
+</pre>
+Design effects are available only for means and totals, and if the analysis function does not compute design effects an error would be given.
+
+    <hr>
+    <address><a href="mailto:tlumley@u.washington.edu">Thomas Lumley</a></address>
+<!-- Created: Tue Apr 12 13:51:50 PDT 2005 -->
+<!-- hhmts start -->
+Last modified: Tue Apr 12 14:08:36 PDT 2005
+<!-- hhmts end -->
+  </body>
+</html>

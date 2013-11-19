@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Analyse multiple imputations</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../R.css">
+</head><body>
+
+<table width="100%" summary="page for with.svyimputationList {survey}"><tr><td>with.svyimputationList {survey}</td><td align="right">R Documentation</td></tr></table>
+<h2>Analyse multiple imputations</h2>
+
+
+<h3>Description</h3>
+
+<p>
+Performs a survey analysis on each of the designs in a
+<code>svyimputationList</code> objects and returns a list of results suitable
+for <code>MIcombine</code>. The analysis may be specified as an expression or
+as a function.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'svyimputationList':
+with(data, expr, fun, ...,multicore=getOption("survey.multicore"))
+## S3 method for class 'svyimputationList':
+subset(x, subset,...,all=FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data,x</code></td>
+<td>
+A <code>svyimputationList</code> object </td></tr>
+<tr valign="top"><td><code>expr</code></td>
+<td>
+An expression giving a survey analysis</td></tr>
+<tr valign="top"><td><code>fun</code></td>
+<td>
+A function taking a survey design object as its argument </td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+for future expansion </td></tr>
+<tr valign="top"><td><code>multicore</code></td>
+<td>
+Use <code>multicore</code> package to distribute imputed data sets over multiple processors?</td></tr>
+<tr valign="top"><td><code>subset</code></td>
+<td>
+An logical expression specifying the subset</td></tr>
+<tr valign="top"><td><code>all</code></td>
+<td>
+If <code>TRUE</code> the subset is those where the expression is <code>TRUE</code> 
+for all imputations, otherwise it is those where the expression is <code>TRUE</code> for
+any imputation.</td></tr>
+</table>
+
+<h3>Value</h3>
+
+<p>
+A list of the results from applying the analysis to each design object.</p>
+
+<h3>See Also</h3>
+
+<p>
+<code>MIcombine</code>, in the <code>mitools</code> package
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+library(mitools)
+data.dir&lt;-system.file("dta",package="mitools")
+files.men&lt;-list.files(data.dir,pattern="m.\\.dta$",full=TRUE)
+men&lt;-imputationList(lapply(files.men, foreign::read.dta))
+files.women&lt;-list.files(data.dir,pattern="f.\\.dta$",full=TRUE)
+women&lt;-imputationList(lapply(files.women, foreign::read.dta))
+men&lt;-update(men, sex=1)
+women&lt;-update(women,sex=0)
+all&lt;-rbind(men,women)
+
+designs&lt;-svydesign(id=~id, strata=~sex, data=all)
+designs
+
+results&lt;-with(designs, svymean(~drkfre))
+
+MIcombine(results)
+
+summary(MIcombine(results))
+</pre>
+
+
+
+<hr><div align="center">[Package <em>survey</em> version 3.18 <a href="00Index.html">Index</a>]</div>
+
+</body></html>
