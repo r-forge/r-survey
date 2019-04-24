@@ -1,6 +1,6 @@
 Package: mitools
 Title: Tools for multiple imputation of missing data
-Version: 2.3
+Version: 2.4
 Author: Thomas Lumley
 Description: Tools to perform analyses and combine results from
         multiple-imputation datasets.
