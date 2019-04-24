@@ -5,7 +5,7 @@
 Maths Performance Data from the PISA 2012 survey in New Zealand
 }
 \description{
-Data on maths performance, gender, some problem-solving variables and some school resource variables. This is actually a weighted survey: see \code{\link[survey]{withPV.survey.design}} for a better analyis.
+Data on maths performance, gender, some problem-solving variables and some school resource variables. This is actually a weighted survey: see \code{\link{withPV.survey.design}} for a better analyis.
 }
 \usage{data("pisamaths")}
 \format{

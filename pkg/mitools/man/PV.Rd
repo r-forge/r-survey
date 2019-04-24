@@ -15,7 +15,7 @@ constructed for each plausible value, which is slower but more general.
 }
 \usage{
 withPV(mapping, data, action, rewrite=TRUE, ...)
-S3method{withPV}{default}(mapping, data, action, rewrite=TRUE,...)
+\S3method{withPV}{default}(mapping, data, action, rewrite=TRUE,...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -57,7 +57,8 @@ data(pisamaths)
 
 models<-withPV(list(maths~PV1MATH+PV2MATH+PV3MATH+PV4MATH+PV5MATH), data=pisamaths,
        action= quote(lm(maths~ ST04Q01*(PCGIRLS+SMRATIO)+MATHEFF+OPENPS,
-       data=.DATA), rewrite=FALSE)
+       data=.DATA)),
+       rewrite=FALSE
 )
 
 summary(MIcombine(models))
