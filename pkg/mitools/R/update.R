@@ -59,7 +59,7 @@ getvars<-function (vars, dbconnection, tables, db.only = TRUE, updates=NULL)
   if (is(dbconnection, "DBIConnection"))
     df <- dbGetQuery(dbconnection, query)
   else ##ODBC
-    df<-sqlQuery(dbconnection, query)
+    df<-RODBC::sqlQuery(dbconnection, query)
   
   df<-updatesOutfilter(df, var0, infilter$history, updates)
   

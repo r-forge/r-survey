@@ -1,5 +1,6 @@
 \name{withPV}
 \alias{withPV}
+\alias{withPV.default}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Analyse plausible values in surveys
