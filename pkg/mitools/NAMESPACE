@@ -1,3 +1,6 @@
+importFrom("methods", "is")
+importFrom("stats", "coef", "model.frame", "qt", "var", "vcov")
+import("DBI")
 export(imputationList,MIcombine, MIextract,withPV)
 S3method(MIcombine, default)
 S3method(dimnames,imputationList)
