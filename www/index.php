@@ -43,13 +43,13 @@ echo $contents; } ?>
 
 <!-- end of project description -->
 
-<p> No content added. </p>
 
 <ul>
-<li> <a href="survey/index.html">survey</a> package web page
+<li> <a href="pkgdown/docs/index.html">pkgdown website with documentation</a>
+<li> <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>R-forge repository page</strong></a>
 <li> <a href="svybook/index.html">Complex Surveys: a guide to analysis using R</a> webpage
+<li> <a href="survey/index.html">survey</a> old package web page
 </ul>
-<p> The <strong>project summary page</strong> you can find <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>. </p>
 
 </body>
 </html>
