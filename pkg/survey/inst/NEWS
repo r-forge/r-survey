@@ -1,3 +1,6 @@
+4.4-3	options(survey.lonely.psu="adjust") needed strata to be a factor or numeric
+	(for Richard Li, Durga Nagori)
+
 4.4-2	Invalid read in C++ code, found by Brian Ripley, fixed by Ben Schneider
 
 	Updated small-area vignette (Peter Gao)

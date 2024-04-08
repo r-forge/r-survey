@@ -117,8 +117,11 @@ svydesign.default<-function(ids,probs=NULL,strata=NULL,variables=NULL, fpc=NULL,
         strata<-data.frame(strata=strata)
       has.strata<-TRUE
       for(i in 1:NCOL(strata)){ ##drop empty strata
-          if (is.factor(strata[[i]]))
+          if (is.factor(strata[[i]])) {
               strata[[i]]<-as.factor(as.character(strata[[i]]))
+          } else if (is.character(strata[[i]])){ ##coerce string to factor
+              strata[[i]]<-as.factor(strata[[i]])
+              }
           }
     } else {
       has.strata <-FALSE
