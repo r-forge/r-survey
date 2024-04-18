@@ -1,3 +1,5 @@
+2.5 fix action=function, rewrite=TRUE case of withPV
+
 2.4 Add support for 'plausible values', ie, imputations of a small number
     of variables stored as columns in the same dataset as everything else
 
