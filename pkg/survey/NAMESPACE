@@ -22,7 +22,8 @@ export(svydesign, svrepdesign, as.svrepdesign,twophase, postStratify,
        psrsq, svysurvreg, cal_names, svycralpha, svyivreg, svynls, svyscoretest,
        oldsvyquantile,svyqqplot, svyqqmath, svybys, svygofchisq,
        poisson_sampling,ppscov,
-       xdesign, svysmoothArea,svysmoothUnit)
+       xdesign, svysmoothArea,svysmoothUnit,
+       multiframe)
 
 S3method(svyloglin,survey.design)
 S3method(svyloglin,svyrep.design)
@@ -539,4 +540,6 @@ S3method(svysmoothUnit, default)
 S3method(summary, svysae)
 
        
-         
+S3method(svytotal, multiframe)
+S3method(svymean, multiframe)
+S3method(print, multiframe)

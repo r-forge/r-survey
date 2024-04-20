@@ -1,6 +1,12 @@
 4.4-3	options(survey.lonely.psu="adjust") needed strata to be a factor or numeric
 	(for Richard Li, Durga Nagori)
 
+	Initial version of multiframe() for dual-frame sampling
+
+	withPV with action=fun and rewrite=TRUE wasn't working
+
+	add "pps_spec" virtual class for all the PPS sparse matrix things
+
 4.4-2	Invalid read in C++ code, found by Brian Ripley, fixed by Ben Schneider
 
 	Updated small-area vignette (Peter Gao)
