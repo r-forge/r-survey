@@ -13,7 +13,7 @@ into multiple separate observations and so the weight is split if it is
 sampled. 
 }
 \usage{
-multiframe(designs, overlaps, estimator = c("constant", "HH", "HT"), theta = NULL)
+multiframe(designs, overlaps, estimator = c("constant", "expected"), theta = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -23,23 +23,26 @@ List of survey design objects
   \item{overlaps}{
 list of matrices. Each matrix has K columns indicating whether the
 observation is in frames 1-K. For the 'constant'-type estimator, this is
-binary. For the \code{HH} and \code{HT} estimators, the entry in row i
+binary. For the \code{expected} estimator the entry in row i
 and column k is the weight that observation i would have had if sampled
 from frame k. 
   }
   \item{estimator}{
     \code{"constant"} specifies Hartley's estimators in which the
-    partition of weights is the same for each observation. \code{"HT"}
-    is the Horvitz-Thompson estimator and \code{"HH"} is the
-    Hansen-Hurvitz estimator proposed by Bankier and by Kalton and Anderson.
+    partition of weights is the same for each observation.
+    \code{"expected"} weights each observation by the reciprocal of the
+    expected number of times it is sampled; it's is the
+    Hansen-Hurvitz-type estimator proposed by Kalton and
+    Anderson. 
   }
   \item{theta}{
   Scale factors adding to 1 for splitting the overlap between frames
   }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
-}
+All these estimators assume sampling is independent between frames, and
+any observation sampled more than once is present multiple times in the data.
+  }
 \value{
 Object of class \code{multiframe}
 }
@@ -60,7 +63,7 @@ Kalton, G. and Anderson, D. W. (1986) Sampling Rare Populations. Journal of the 
   Metcalf P and Scott AJ (2009) Using multiple frames in health
   surveys. Stat Med 28:1512–1523
 
-  For general reference
+  For general reference:
   Lohr SL, Rao JNK. Inference from dual frame surveys. Journal of the American Statistical Association 2000; 94:271–280.
 
   Lohr SL, Rao JNK. Estimation in multiple frame surveys. Journal of the American Statistical Association 2006; 101:1019–1030.

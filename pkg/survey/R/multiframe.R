@@ -6,16 +6,14 @@
 ## data representation could just be a single design with stacked data, or we could create that each time
 ## problem: can't easily mix repweights and linearisation.
 ##
-## maybe stack to do point estimation then separate to do variances?
-##
-## update.multiframe: optimal theta for a particular analysis?
-
 ## variance of sum(w*y) is sum_{ij} \check{Delta}(w_i\pi_i\check{y}_i)(w_j\pi_j\check{y}_j)
+##
+## optimise: choose theta to minimise varhat(total(A)) for some A?
 
 
-multiframe<-function(designs, overlaps, estimator=c("constant","HH","HT"),theta=NULL){
+multiframe<-function(designs, overlaps, estimator=c("constant","expected"),theta=NULL){
     estimator<-match.arg(estimator)
-    if (estimator != "constant") stop("only Hartley estimator for now")
+    if (estimator != "constant") stop("only 'constant' estimator for now")
 
     nframes<-length(designs)
     if(nframes!=2) stop("only two frames for now")
@@ -27,9 +25,9 @@ multiframe<-function(designs, overlaps, estimator=c("constant","HH","HT"),theta=
         if (is.null(theta))
             frame_scale<-mean_weights/sum(mean_weights)
         else
-            frame_scale<-cbind(theta,1-theta)
+            frame_scale<-cbind(theta, 1-theta)
     }
-    
+
     frame_weights<-vector("list",2)
     for(f in 1:nframes){
         frame_weights[[f]]<-ifelse(overlaps[[f]][,3-f]>0, frame_scale[f], 1)
@@ -43,9 +41,8 @@ multiframe<-function(designs, overlaps, estimator=c("constant","HH","HT"),theta=
         } else {
             survey:::Dcheck_multi(d$cluster,d$strat,d$allprob)
         }})
-
     
-    rval<-list(designs=designs, frame_scale=frame_scale, frame_weights=frame_weights,
+    rval<-list(designs=designs,overlaps=overlaps, frame_scale=frame_scale, frame_weights=frame_weights,
                design_weights=design_weights,call=sys.call(), dchecks=dchecks)
     class(rval)<-"multiframe"
     rval
@@ -57,6 +54,22 @@ print.multiframe<-function(x,...) {
     print(x$call)
     invisible(x)
 }
+
+summary.multiframe<-function(object,...){
+    s<-list(object$designs, do.call(rbind,lapply(object$overlaps, function(x) colSums(x>0))),call=object$call)
+    class(s)<-"summary.multiframe"
+    s
+}
+
+print.summary.multiframe<-function(x,...){
+    cat("Multiframe object: ")
+    print(x$call)
+    cat("  with frame memberships\n ")
+    print(x[[2]])
+    cat("  and samples\n")
+    print(x[[1]])
+    invisible(x)
+    }
 
 
 oneframe_getdata<-function(formula, design){
@@ -73,7 +86,6 @@ oneframe_getdata<-function(formula, design){
     colnames(x) <- do.call("c", lapply(xx, colnames))
     x
 }
-    
 
 multiframe_getdata<-function(formula, designs, na.rm=FALSE){
     datas<- lapply(designs, oneframe_getdata, formula=formula)
