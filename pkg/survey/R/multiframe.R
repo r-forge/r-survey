@@ -49,6 +49,10 @@ multiframe<-function(designs, overlaps, estimator=c("constant","expected"),theta
 
 }
 
+degf.multiframe<-function(design,...){
+    sum(sapply(design$designs,degf))-length(design$designs)+1
+}
+
 print.multiframe<-function(x,...) {
     cat("Multiframe object: ")
     print(x$call)
@@ -92,8 +96,8 @@ multiframe_getdata<-function(formula, designs, na.rm=FALSE){
     do.call(rbind,datas)
 }
 
-svytotal.multiframe<-function(formula,design, na.rm=FALSE,...){
-    x<-multiframe_getdata(formula, design$designs)
+svytotal.multiframe<-function(x,design, na.rm=FALSE,...){
+    x<-multiframe_getdata(x, design$designs)
 
     total<-colSums(x*design$frame_weights*design$design_weights)
     V<-multiframevar(x*design$frame_weights*design$design_weights, design$dchecks)
@@ -103,8 +107,8 @@ svytotal.multiframe<-function(formula,design, na.rm=FALSE,...){
     total
 }
 
-svymean.multiframe<-function(formula, design, na.rm=FALSE,...){
-    x<-multiframe_getdata(formula, design$designs)
+svymean.multiframe<-function(x, design, na.rm=FALSE,...){
+    x<-multiframe_getdata(x, design$designs)
     fw<-design$frame_weights*design$design_weights
     mean<-colSums(x[,drop=FALSE]*fw)/sum(fw)
     inf_fun<-sweep(x,1, mean)/sum(design$design_weights)
@@ -113,6 +117,79 @@ svymean.multiframe<-function(formula, design, na.rm=FALSE,...){
     class(mean)<-"svystat"
     attr(mean,"statistic")<-"mean"
     mean
+}
+
+svyglm.multiframe<-function(formula, design, subset=NULL, family=stats::gaussian()){
+    subset <- substitute(subset)
+    subset <- eval(subset, model.frame(design), parent.frame())
+    if (!is.null(subset)) {
+        if (any(is.na(subset))) 
+            stop("subset must not contain NA values")
+        design <- design[subset, ]
+    }
+    data <-do.call(rbind,lapply(design$designs, function(d) model.frame(d)[,all.vars(formula)]))
+    g <- match.call()
+    g$formula <- eval.parent(g$formula)
+    g$influence <- NULL
+    g$design <- NULL
+    g$var <- NULL
+    g$rescale <- NULL
+    g$deff <- NULL
+    g$subset <- NULL
+    g$family <- family
+    if (is.null(g$weights)) 
+        g$weights <- quote(.survey.multiframe.weights)
+    else g$weights <- bquote(.survey.multiframe.weights * .(g$weights))
+    g$data <- quote(data)
+    g[[1]] <- quote(glm)
+    fw<-design$frame_weights*design$design_weights
+    if (rescale) 
+        data$.survey.multiframe.weights <- fw/mean(fw)
+    else data$.survey.multiframe.weights <-fw
+    if (any(is.na(data$.survey.prob.weights))) 
+        stop("weights must not contain NA values")
+    if (!all(all.vars(formula) %in% names(data))) 
+        stop("all variables must be in design= argument")
+    g <- with(list(data = data), eval(g))
+
+    
+    summ <- summary(g)
+    g$naive.cov <- summ$cov.unscaled
+    nas <- g$na.action
+    if (length(nas)) 
+        design <- design[-nas, ]
+    
+    g$cov.unscaled <- svy.varcoef(g, design)
+    g$df.residual <- degf(design) + 1 - length(coef(g)[!is.na(coef(g))])
+    class(g) <- c("svyglm", class(g))
+    g$call <- match.call()
+    g$call[[1]] <- as.name(.Generic)
+    if (!("formula" %in% names(g$call))) {
+        if (is.null(names(g$call))) 
+            i <- 1
+        else i <- min(which(names(g$call)[-1] == ""))
+        names(g$call)[i + 1] <- "formula"
+    }
+    if (deff) {
+        vsrs <- summ$cov.scaled * mean(data$.survey.prob.weights)
+        attr(g, "deff") <- g$cov.unscaled/vsrs
+    }
+    if (influence) {
+        estfun <- model.matrix(g) * naa_shorter(nas, resid(g, 
+            "working")) * g$weights
+        if (g$rank < NCOL(estfun)) {
+            estfun <- estfun[, g$qr$pivot[1:g$rank]]
+        }
+        if (length(nas) && (NROW(data) > NROW(estfun))) {
+            estfun1 <- matrix(0, ncol = ncol(estfun), nrow = nrow(data))
+            estfun1[-nas, ] <- estfun
+            estfun <- estfun1
+        }
+        attr(g, "influence") <- estfun %*% g$naive.cov
+    }
+    g$survey.design <- design
+    g
+
 }
 
 multiframevar<-function(x, dchecks){
