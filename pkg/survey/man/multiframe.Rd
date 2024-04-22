@@ -64,9 +64,9 @@ Kalton, G. and Anderson, D. W. (1986) Sampling Rare Populations. Journal of the 
   surveys. Stat Med 28:1512–1523
 
   For general reference:
-  Lohr SL, Rao JNK. Inference from dual frame surveys. Journal of the American Statistical Association 2000; 94:271–280.
+  Lohr SL, Rao JNK. Inference from dual frame surveys. Journal of the American Statistical Association 2000; 94:271-280.
 
-  Lohr SL, Rao JNK. Estimation in multiple frame surveys. Journal of the American Statistical Association 2006; 101:1019–1030.
+  Lohr SL, Rao JNK. Estimation in multiple frame surveys. Journal of the American Statistical Association 2006; 101:1019-1030.
 }
 \examples{
 

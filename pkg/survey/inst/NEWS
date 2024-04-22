@@ -3,6 +3,8 @@
 
 	Initial version of multiframe() for dual-frame sampling
 
+	Initial version of withCrossval() for cross-validation
+
 	withPV with action=fun and rewrite=TRUE wasn't working
 
 	add "pps_spec" virtual class for all the PPS sparse matrix things

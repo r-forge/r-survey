@@ -119,7 +119,7 @@ svymean.multiframe<-function(x, design, na.rm=FALSE,...){
     mean
 }
 
-svyglm.multiframe<-function(formula, design, subset=NULL, family=stats::gaussian()){
+svyglm.multiframe<-function(formula, design, subset=NULL, family=stats::gaussian(), rescale=TRUE){
     subset <- substitute(subset)
     subset <- eval(subset, model.frame(design), parent.frame())
     if (!is.null(subset)) {
