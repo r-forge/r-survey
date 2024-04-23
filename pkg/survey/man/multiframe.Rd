@@ -61,7 +61,7 @@ Kalton, G. and Anderson, D. W. (1986) Sampling Rare Populations. Journal of the 
 
   For a simple introduction:
   Metcalf P and Scott AJ (2009) Using multiple frames in health
-  surveys. Stat Med 28:1512–1523
+  surveys. Stat Med 28:1512-1523
 
   For general reference:
   Lohr SL, Rao JNK. Inference from dual frame surveys. Journal of the American Statistical Association 2000; 94:271-280.

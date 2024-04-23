@@ -338,6 +338,9 @@ S3method(dimnames,twophase)
 S3method(dimnames, DBIsvydesign)
 S3method(dimnames, DBIrepdesign)
 S3method(dimnames, svyimputationList)
+S3method(dimnames, multiframe)
+S3method(dimnames, twophase)
+S3method(dimnames, twophase2)
 
 S3method(dimnames, repweights_compressed)
 

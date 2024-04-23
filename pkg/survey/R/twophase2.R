@@ -288,6 +288,9 @@ print.summary.twophase2<-function(x,...,varnames=TRUE){
   invisible(x)
 }
 
+dimnames.twophase2<-function(x) dimnames(x$phase1$full$variables)
+
+
 twophase2var<-function(x,design){
   ## calibration is allowed at phase one or phase two,
   ## but not for clusters within a phase

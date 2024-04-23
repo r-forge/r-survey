@@ -141,6 +141,8 @@ print.summary.twophase<-function(x,...,varnames=TRUE){
   invisible(x)
 }
 
+dimnames.twophase<-function(x) dimnames(x$phase1$full$variables)
+
 twophasevar<-function(x,design){
   d1 <- design$phase1$sample
   if (NROW(x)==length(design$usu)){
