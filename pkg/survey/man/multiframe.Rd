@@ -7,9 +7,9 @@
 \description{
 Given a list of samples from K different sampling frames and information
 about which observations are in which frame, constructs an object
-representing the whole multi-frame sample. If an observation is in the
+representing the whole multi-frame sample. If an unit is in the
 overlap of multiple frames in the population it is effectively split
-into multiple separate observations and so the weight is split if it is
+into multiple separate units and so the weight is split if it is
 sampled. 
 }
 \usage{
@@ -31,16 +31,15 @@ from frame k.
     \code{"constant"} specifies Hartley's estimators in which the
     partition of weights is the same for each observation.
     \code{"expected"} weights each observation by the reciprocal of the
-    expected number of times it is sampled; it's is the
-    Hansen-Hurvitz-type estimator proposed by Kalton and
-    Anderson. 
+    expected number of times it is sampled; it is the estimator proposed
+    by Bankier and by Kalton and Anderson. 
   }
   \item{theta}{
   Scale factors adding to 1 for splitting the overlap between frames
   }
 }
 \details{
-All these estimators assume sampling is independent between frames, and
+All these estimators assume sampling is independent between frames, and that
 any observation sampled more than once is present multiple times in the data.
   }
 \value{

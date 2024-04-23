@@ -14,7 +14,7 @@
 
 multiframe<-function(designs, overlaps, estimator=c("constant","expected"),theta=NULL){
     estimator<-match.arg(estimator)
-    if (estimator != "constant") stop("only 'constant' estimator for now")
+    #if (estimator != "constant") stop("only 'constant' estimator for now")
 
     lapply(designs, function(design) {
         if( !inherits(design,"survey.design2") && !inherits(design,"pps"))
@@ -23,6 +23,7 @@ multiframe<-function(designs, overlaps, estimator=c("constant","expected"),theta
     nframes<-length(designs)
     if(nframes!=2) stop("only two frames for now")
     frame_sizes<-sapply(designs, nrow)
+    frame_weights<-vector("list",nframes)
 
     mean_weights<-sapply(designs, function(d) mean(weights(d), type="sampling"))
 
@@ -31,7 +32,6 @@ multiframe<-function(designs, overlaps, estimator=c("constant","expected"),theta
             frame_scale<-mean_weights/sum(mean_weights)
         else
             frame_scale<-cbind(theta, 1-theta)
-        frame_weights<-vector("list",2)
         for(f in 1:nframes){
             frame_weights[[f]]<-ifelse(overlaps[[f]][,3-f]>0, frame_scale[f], 1)
         }
@@ -41,7 +41,7 @@ multiframe<-function(designs, overlaps, estimator=c("constant","expected"),theta
         frame_scale<-NULL
         for(f in 1:nframes){
             overlaps[[f]][overlaps[[f]]==0]<-NA
-            frame_weights[[f]]<-rowSums(1/overlaps[[f]],na.rm=TRUE)/weights(designs[[f]],"sampling")
+            frame_weights[[f]]<-(1/rowSums(1/overlaps[[f]],na.rm=TRUE))/weights(designs[[f]],"sampling")
         }
         frame_weights<-do.call(c,frame_weights)
     }
