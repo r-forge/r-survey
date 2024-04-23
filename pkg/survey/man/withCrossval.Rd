@@ -12,7 +12,7 @@
   level; bootstrap weights are similar to bootstrapping for cross-validation.
 }
 \usage{
-withCrossval(design, formula, trainfun, testfun, loss = c("RMSE", "entropy", "AbsError", "Gini"), intercept, ...)
+withCrossval(design, formula, trainfun, testfun, loss = c("RMSE", "entropy", "AbsError", "Gini"), intercept=TRUE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -48,9 +48,9 @@ withCrossval(design, formula, trainfun, testfun, loss = c("RMSE", "entropy", "Ab
 A number
 }
 \references{
-Iparragirre, A., Lumley, T., Barrio, I., & Arostegui,
-I. (2023). Variable selection with LASSO regression for complex survey
-data. Stat, 12(1), e578. \url{https://doi.org/10.1002/sta4.578}
+Iparragirre, A., Lumley, T., Barrio, I., & Arostegui, I. (2023).
+Variable selection with LASSO regression for complex survey data.
+Stat, 12(1), e578. \url{https://doi.org/10.1002/sta4.578}
 }
 
 
@@ -66,4 +66,5 @@ withCrossval(rclus1, api00~api99+ell+stype,
   trainfun=function(X,y,w) lm.wfit(X,y,w),
   testfun=function(X, trainfit) X\%*\%coef(trainfit),
   intercept=TRUE,loss="RMSE")
+
 }
