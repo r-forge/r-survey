@@ -543,6 +543,11 @@ S3method(summary, svysae)
 S3method(svytotal, multiframe)
 S3method(svymean, multiframe)
 S3method(print, multiframe)
+S3method(summary, multiframe)
+S3method(print,summary.multiframe)
+S3method(svyglm, multiframe)
+S3method(degf, multiframe)
+S3method(print, dualframe)
 
 
 S3method(withCrossval, svyrep.design)

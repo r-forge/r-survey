@@ -1,7 +1,6 @@
 ## designs is just a list of designs  [? can we handle replicate weights]
 ## overlaps is a matrix whose [i,d] element says whether obs i is in frame d (binary) or what its weight is in frame d
-## calibration is only going to be possible for the "constant" (Hartley)
-
+## calibration is going to be pretty limited
 ##
 ## data representation could just be a single design with stacked data, or we could create that each time
 ## problem: can't easily mix repweights and linearisation.
@@ -9,12 +8,18 @@
 ## variance of sum(w*y) is sum_{ij} \check{Delta}(w_i\pi_i\check{y}_i)(w_j\pi_j\check{y}_j)
 ##
 ## optimise: choose theta to minimise varhat(total(A)) for some A?
+##   dual-frame: optimise the variance of anything you like, or choose a compromise graphically
+##   multiframe: one of the formulas from eg Lohr & Rao
 
 
 multiframe<-function(designs, overlaps, estimator=c("constant","expected"),theta=NULL){
     estimator<-match.arg(estimator)
     if (estimator != "constant") stop("only 'constant' estimator for now")
 
+    lapply(designs, function(design) {
+        if( !inherits(design,"survey.design2") && !inherits(design,"pps"))
+            stop("only svydesign() objects for now")})
+    
     nframes<-length(designs)
     if(nframes!=2) stop("only two frames for now")
     frame_sizes<-sapply(designs, nrow)
@@ -26,13 +31,21 @@ multiframe<-function(designs, overlaps, estimator=c("constant","expected"),theta
             frame_scale<-mean_weights/sum(mean_weights)
         else
             frame_scale<-cbind(theta, 1-theta)
+        frame_weights<-vector("list",2)
+        for(f in 1:nframes){
+            frame_weights[[f]]<-ifelse(overlaps[[f]][,3-f]>0, frame_scale[f], 1)
+        }
+        frame_weights<-do.call(c, frame_weights)
+        
+    } else if (estimator=="expected"){
+        frame_scale<-NULL
+        for(f in 1:nframes){
+            overlaps[[f]][overlaps[[f]]==0]<-NA
+            frame_weights[[f]]<-rowSums(1/overlaps[[f]],na.rm=TRUE)/weights(designs[[f]],"sampling")
+        }
+        frame_weights<-do.call(c,frame_weights)
     }
 
-    frame_weights<-vector("list",2)
-    for(f in 1:nframes){
-        frame_weights[[f]]<-ifelse(overlaps[[f]][,3-f]>0, frame_scale[f], 1)
-        }
-    frame_weights<-do.call(c, frame_weights)
     design_weights<-do.call(c, lapply(designs, weights, type="sampling"))
 
     dchecks<-lapply(designs, function(d){
@@ -44,13 +57,22 @@ multiframe<-function(designs, overlaps, estimator=c("constant","expected"),theta
     
     rval<-list(designs=designs,overlaps=overlaps, frame_scale=frame_scale, frame_weights=frame_weights,
                design_weights=design_weights,call=sys.call(), dchecks=dchecks)
-    class(rval)<-"multiframe"
+    if (length(designs)==2)
+        class(rval)<-c("dualframe","multiframe")
+    else
+        class(rval)<-"multiframe"
     rval
 
 }
 
 degf.multiframe<-function(design,...){
     sum(sapply(design$designs,degf))-length(design$designs)+1
+}
+
+print.dualframe<-function(x,...) {
+    cat("Dual-frame object: ")
+    print(x$call)
+    invisible(x)
 }
 
 print.multiframe<-function(x,...) {
@@ -97,8 +119,9 @@ multiframe_getdata<-function(formula, designs, na.rm=FALSE){
 }
 
 svytotal.multiframe<-function(x,design, na.rm=FALSE,...){
-    x<-multiframe_getdata(x, design$designs)
-
+    if (inherits(x,"formula"))
+        x<-multiframe_getdata(x, design$designs)
+    
     total<-colSums(x*design$frame_weights*design$design_weights)
     V<-multiframevar(x*design$frame_weights*design$design_weights, design$dchecks)
     attr(total,"var")<-V
@@ -119,15 +142,11 @@ svymean.multiframe<-function(x, design, na.rm=FALSE,...){
     mean
 }
 
-svyglm.multiframe<-function(formula, design, subset=NULL, family=stats::gaussian(), rescale=TRUE){
-    subset <- substitute(subset)
-    subset <- eval(subset, model.frame(design), parent.frame())
-    if (!is.null(subset)) {
-        if (any(is.na(subset))) 
-            stop("subset must not contain NA values")
-        design <- design[subset, ]
-    }
+svyglm.multiframe<-function(formula, design, subset=NULL, family=stats::gaussian(),
+                            rescale=TRUE,deff=FALSE,influence=FALSE,...){
+   
     data <-do.call(rbind,lapply(design$designs, function(d) model.frame(d)[,all.vars(formula)]))
+    if (!is.null(subset)) stop("subset not implemented")
     g <- match.call()
     g$formula <- eval.parent(g$formula)
     g$influence <- NULL
@@ -158,8 +177,20 @@ svyglm.multiframe<-function(formula, design, subset=NULL, family=stats::gaussian
     nas <- g$na.action
     if (length(nas)) 
         design <- design[-nas, ]
+
+    estfun <- model.matrix(g) * naa_shorter(nas, resid(g, 
+            "working")) * g$weights
+    if (g$rank < NCOL(estfun)) {
+        estfun <- estfun[, g$qr$pivot[1:g$rank]]
+    }
+    if (length(nas) && (NROW(data) > NROW(estfun))) {
+        estfun1 <- matrix(0, ncol = ncol(estfun), nrow = nrow(data))
+        estfun1[-nas, ] <- estfun
+        estfun <- estfun1
+    }
+    inf_fun<- estfun %*% g$naive.cov
+    g$cov.unscaled <- vcov(svytotal(inf_fun, design))
     
-    g$cov.unscaled <- svy.varcoef(g, design)
     g$df.residual <- degf(design) + 1 - length(coef(g)[!is.na(coef(g))])
     class(g) <- c("svyglm", class(g))
     g$call <- match.call()
@@ -171,25 +202,14 @@ svyglm.multiframe<-function(formula, design, subset=NULL, family=stats::gaussian
         names(g$call)[i + 1] <- "formula"
     }
     if (deff) {
-        vsrs <- summ$cov.scaled * mean(data$.survey.prob.weights)
+        vsrs <- summ$cov.scaled * mean(data$.survey.multiframe.weights)
         attr(g, "deff") <- g$cov.unscaled/vsrs
     }
     if (influence) {
-        estfun <- model.matrix(g) * naa_shorter(nas, resid(g, 
-            "working")) * g$weights
-        if (g$rank < NCOL(estfun)) {
-            estfun <- estfun[, g$qr$pivot[1:g$rank]]
-        }
-        if (length(nas) && (NROW(data) > NROW(estfun))) {
-            estfun1 <- matrix(0, ncol = ncol(estfun), nrow = nrow(data))
-            estfun1[-nas, ] <- estfun
-            estfun <- estfun1
-        }
-        attr(g, "influence") <- estfun %*% g$naive.cov
+        attr(g, "influence") <- inf_fun
     }
     g$survey.design <- design
     g
-
 }
 
 multiframevar<-function(x, dchecks){
@@ -198,7 +218,18 @@ multiframevar<-function(x, dchecks){
     V<-matrix(0,ncol=NCOL(x),nrow=NCOL(x))
     dimnames(V)<-list(colnames(x),colnames(x))
     for(i in 1:length(dchecks)){
-        V<-V+survey:::htvar.matrix(x[(cutpoints[i]+1):cutpoints[i+1],drop=FALSE], dchecks[[i]])
+        V<-V+survey:::htvar.matrix(x[(cutpoints[i]+1):cutpoints[i+1],,drop=FALSE], dchecks[[i]])
         }
     V
 }
+
+
+dimnames.multiframe<-function(x,...){
+    maybe_names<-lapply(x$designs,colnames)
+    list(NULL,Reduce("intersect", maybe_names))
+    }
+
+
+reweight<-function(design,...) UseMethod("reweight")
+reweight.dualframe<-function(design, ...) stop("dual-frame reweighting under construction")
+reweight.multiframe<-function(design, ...) stop("multi-frame reweighting under construction")
