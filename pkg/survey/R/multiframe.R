@@ -7,7 +7,7 @@
 ##
 ## variance of sum(w*y) is sum_{ij} \check{Delta}(w_i\pi_i\check{y}_i)(w_j\pi_j\check{y}_j)
 ##
-## optimise: choose theta to minimise varhat(total(A)) for some A?
+## reweight: choose theta to minimise varhat(total(A)) for some A?
 ##   dual-frame: optimise the variance of anything you like, or choose a compromise graphically
 ##   multiframe: one of the formulas from eg Lohr & Rao
 
@@ -134,7 +134,7 @@ svymean.multiframe<-function(x, design, na.rm=FALSE,...){
     x<-multiframe_getdata(x, design$designs)
     fw<-design$frame_weights*design$design_weights
     mean<-colSums(x[,drop=FALSE]*fw)/sum(fw)
-    inf_fun<-sweep(x,1, mean)/sum(design$design_weights)
+    inf_fun<-sweep(x,1, mean)/sum(fw)
     V<-multiframevar(inf_fun*fw, design$dchecks)
     attr(mean,"var")<-V
     class(mean)<-"svystat"
@@ -189,7 +189,7 @@ svyglm.multiframe<-function(formula, design, subset=NULL, family=stats::gaussian
         estfun <- estfun1
     }
     inf_fun<- estfun %*% g$naive.cov
-    g$cov.unscaled <- vcov(svytotal(inf_fun, design))
+    g$cov.unscaled <- multiframevar(inf_fun, design$dchecks)
     
     g$df.residual <- degf(design) + 1 - length(coef(g)[!is.na(coef(g))])
     class(g) <- c("svyglm", class(g))
@@ -229,6 +229,45 @@ dimnames.multiframe<-function(x,...){
     list(NULL,Reduce("intersect", maybe_names))
     }
 
+
+
+"[.multiframe"<-function (x, i, ..., drop = TRUE) {
+    if (!missing(i)) {
+            if (is.logical(i)) 
+                x$design_weights[!i] <- 0
+            else if (is.numeric(i) && length(i)) 
+                x$design_weights[-i] <- 0
+            else {
+                tmp <- x$design_weights[i, ]
+                x$design_weights <- rep(0, length(x$design_weights))
+                x$design_weights[i, ] <- tmp
+            }
+        } 
+    if (...length()>0 && !is.null(x$variables)) {
+        for (d in length(x$designs)){
+            x[[d]]$variables <- x[[d]]$variables[, ..1, drop = FALSE]
+        }
+    }
+    x
+}
+
+subset.multiframe<-function (x, subset, ...) 
+{
+    e <- substitute(subset)
+    pf<-parent.frame()
+    rs <- lapply(x$designs, function(d) eval(e, d$variables, pf))
+    r<-do.call(c,rs)
+    r <- r & !is.na(r)
+    x <- x[r, ]
+    x$call <- sys.call(-1)
+    x
+}
+
+
+svyvar.multiframe<-function(x,...) {
+    warning("FIXME in svyvar.multiframe")
+    42
+    }
 
 reweight<-function(design,...) UseMethod("reweight")
 reweight.dualframe<-function(design, ...) stop("dual-frame reweighting under construction")

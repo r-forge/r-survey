@@ -551,6 +551,8 @@ S3method(print,summary.multiframe)
 S3method(svyglm, multiframe)
 S3method(degf, multiframe)
 S3method(print, dualframe)
-
+S3method(subset, multiframe)
+S3method(`[`, multiframe)
+S3method(svyvar, multiframe)
 
 S3method(withCrossval, svyrep.design)
