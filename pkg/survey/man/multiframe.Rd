@@ -39,6 +39,11 @@ from frame k.
   }
 }
 \details{
+It is not necessary that the frame samples contain exactly the same
+variables, although only variables present in all the samples can be
+used.  It is important that factor variables existing across more than
+one frame sample have the same factor levels in all the samples. 
+  
 All these estimators assume sampling is independent between frames, and that
 any observation sampled more than once is present multiple times in the data.
   }
