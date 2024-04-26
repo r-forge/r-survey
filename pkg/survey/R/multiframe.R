@@ -132,7 +132,7 @@ svymean.multiframe<-function(x, design, na.rm=FALSE,...){
     x<-multiframe_getdata(x, design$designs)
     fw<-design$frame_weights*design$design_weights
     mean<-colSums(x[,drop=FALSE]*fw)/sum(fw)
-    inf_fun<-sweep(x,1, mean)/sum(fw)
+    inf_fun<-sweep(x,2, mean)/sum(fw)
     V<-multiframevar(inf_fun*fw, design$dchecks)
     attr(mean,"var")<-V
     class(mean)<-"svystat"
