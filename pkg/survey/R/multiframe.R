@@ -2,8 +2,6 @@
 ## overlaps is a matrix whose [i,d] element says whether obs i is in frame d (binary) or what its weight is in frame d
 ## calibration is going to be pretty limited
 ##
-## data representation could just be a single design with stacked data, or we could create that each time
-## problem: can't easily mix repweights and linearisation.
 ##
 ## variance of sum(w*y) is sum_{ij} \check{Delta}(w_i\pi_i\check{y}_i)(w_j\pi_j\check{y}_j)
 ##
@@ -52,7 +50,7 @@ multiframe<-function(designs, overlaps, estimator=c("constant","expected"),theta
         if(inherits(d,"pps")){
             d$dcheck[[1]]$dcheck
         } else {
-            survey:::Dcheck_multi(d$cluster,d$strat,d$allprob)
+            Dcheck_multi(d$cluster,d$strat,d$allprob)
         }})
     
     rval<-list(designs=designs,overlaps=overlaps, frame_scale=frame_scale, frame_weights=frame_weights,
@@ -142,7 +140,7 @@ svymean.multiframe<-function(x, design, na.rm=FALSE,...){
     mean
 }
 
-svyglm.multiframe<-function(formula, design, subset=NULL, family=stats::gaussian(),
+svyglm.multiframe<-function(formula, design, subset=NULL, family=stats::gaussian(), start,
                             rescale=TRUE,deff=FALSE,influence=FALSE,...){
    
     data <-do.call(rbind,lapply(design$designs, function(d) model.frame(d)[,all.vars(formula)]))
@@ -218,7 +216,7 @@ multiframevar<-function(x, dchecks){
     V<-matrix(0,ncol=NCOL(x),nrow=NCOL(x))
     dimnames(V)<-list(colnames(x),colnames(x))
     for(i in 1:length(dchecks)){
-        V<-V+survey:::htvar.matrix(x[(cutpoints[i]+1):cutpoints[i+1],,drop=FALSE], dchecks[[i]])
+        V<-V+htvar.matrix(x[(cutpoints[i]+1):cutpoints[i+1],,drop=FALSE], dchecks[[i]])
         }
     V
 }

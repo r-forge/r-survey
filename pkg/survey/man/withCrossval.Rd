@@ -12,7 +12,7 @@
   level; bootstrap weights are similar to bootstrapping for cross-validation.
 }
 \usage{
-withCrossval(design, formula, trainfun, testfun, loss = c("RMSE", "entropy", "AbsError", "Gini"), intercept=TRUE, ...)
+withCrossval(design, formula, trainfun, testfun, loss = c("RMSE", "entropy", "AbsError", "Gini"), intercept, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
