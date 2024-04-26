@@ -73,5 +73,17 @@ Kalton, G. and Anderson, D. W. (1986) Sampling Rare Populations. Journal of the 
   Lohr SL, Rao JNK. Estimation in multiple frame surveys. Journal of the American Statistical Association 2006; 101:1019-1030.
 }
 \examples{
+data(phoneframes)
+A_in_frames<-cbind(1, DatA$Domain=="ab")
+B_in_frames<-cbind(DatB$Domain=="ba",1)
+
+Bdes_pps<-svydesign(id=~1, fpc=~ProbB, data=DatB,pps=ppsmat(PiklB))
+Ades_pps <-svydesign(id=~1, fpc=~ProbA,data=DatA,pps=ppsmat(PiklA))
+
+## optimal constant (Hartley) weighting
+mf_pps<-multiframe(list(Ades_pps,Bdes_pps),list(A_in_frames,B_in_frames),theta=0.74) 
+svytotal(~Lei,mf_pps)
+svymean(~Lei, mf_pps)
+
 
 }
