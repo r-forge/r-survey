@@ -67,14 +67,15 @@ Ades_pps <-svydesign(id=~1, fpc=~ProbA,data=DatA,pps=ppsmat(PiklA))
 
 ## Not very good weighting
 mf_pps<-multiframe(list(Ades_pps,Bdes_pps),list(A_in_frames,B_in_frames),theta=0.5) 
-svytotal(~Lei+Feed,mf_pps)
+svytotal(~Lei+Feed+Tax+Clo,mf_pps)
 
 ## try to optimise
-mf_opt<-reweight(mf_pps, totals=list(~Lei, ~Feed))
+mf_opt<-reweight(mf_pps, totals=list(~Lei, ~Feed,~Tax,~Clo))
 plot(mf_opt)
-## a good compromise is 0.80
+## a good compromise is 0.80 for everything except Tax
+## and it's still pretty good there
 mf_pps_opt<-reweight(mf_opt,theta=0.80) 
-svytotal(~Lei+Feed,mf_pps_opt)
+svytotal(~Lei+Feed+Tax+Clo,mf_pps_opt)
 
 
 }
