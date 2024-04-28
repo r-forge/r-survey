@@ -1,0 +1,80 @@
+\name{reweight}
+\alias{reweight}
+\alias{reweight.dualframe}
+\alias{plot.dualframe_with_rewt}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{
+Reweight (optimise) the weights on frames
+}
+\description{
+Evaluates a set of expressions for different frame weights in a
+dual-frame/multi-frame design, so that an optimal or
+compromise-optimal set of frame weights can be chosen
+}
+\usage{
+reweight(design, ...)
+\method{reweight}{dualframe}(design, targets=NULL, totals=NULL,
+                             estimator=c("constant","expected"),
+                             theta=NULL, ...)
+\method{plot}{dualframe_with_rewt}(x,y,type="b",...)
+}
+%- maybe also 'usage' for other objects documented here.
+\arguments{
+  \item{design}{
+dual-frame or multiframe design object
+  }
+\item{targets, totals}{A list of quoted expressions estimating the
+  variance of a survey estimator (\code{targets}), or a list of formulas
+  that will be turned into targets for the variances of totals.}
+\item{estimator}{As in \code{\link{multiframe}}: \code{"constant"} is a
+  constant weight for all observations in an overlap between frames,
+  \code{"expected"} weights by the reciprocal of the expected numbers of
+  times a unit is sampled and is not optimisable.}
+\item{theta}{As in \code{\link{multiframe}}, a fixed weight for
+  observations in frame 1 also sampled in frame 2}
+\item{x}{object produced by \code{reweight}}
+\item{y}{ignored}
+  \item{type,\dots}{
+    in the \code{plot} method these are passed to \code{\link{matplot}}
+  }
+}
+\details{
+Traditionally, this optimisation has been done with totals, which is a
+good default and more mathematically tractable. However, when
+the point of multiple-frame sampling is to improve precision for a rare
+sub-population, or when you're doing regression modelling, you might
+want to optimise for something else.
+}
+\value{
+  An object of class "dualframe_with_rewt".
+  The \code{rewt} element includes the optimal thetas for each target in
+  \code{theta_opt} and the variances of each target on a grid of
+  \code{theta} in \code{variances}
+}
+
+
+
+\seealso{
+\code{\link{multiframe}}
+}
+\examples{
+data(phoneframes)
+A_in_frames<-cbind(1, DatA$Domain=="ab")
+B_in_frames<-cbind(DatB$Domain=="ba",1)
+
+Bdes_pps<-svydesign(id=~1, fpc=~ProbB, data=DatB,pps=ppsmat(PiklB))
+Ades_pps <-svydesign(id=~1, fpc=~ProbA,data=DatA,pps=ppsmat(PiklA))
+
+## Not very good weighting
+mf_pps<-multiframe(list(Ades_pps,Bdes_pps),list(A_in_frames,B_in_frames),theta=0.5) 
+svytotal(~Lei+Feed,mf_pps)
+
+## try to optimise
+mf_opt<-reweight(mf_pps, totals=list(~Lei, ~Feed))
+plot(mf_opt)
+## a good compromise is 0.80
+mf_pps_opt<-reweight(mf_opt,theta=0.80) 
+svytotal(~Lei+Feed,mf_pps_opt)
+
+
+}
