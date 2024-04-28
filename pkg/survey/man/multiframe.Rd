@@ -24,8 +24,8 @@ List of survey design objects
 list of matrices. Each matrix has K columns indicating whether the
 observation is in frames 1-K. For the 'constant'-type estimator, this is
 binary. For the \code{expected} estimator the entry in row i
-and column k is the weight that observation i would have had if sampled
-from frame k. 
+and column k is the weight or probability that observation i would have had if sampled
+from frame k. (weights if all >=1, probabilities if all <=1)
   }
   \item{estimator}{
     \code{"constant"} specifies Hartley's estimators in which the

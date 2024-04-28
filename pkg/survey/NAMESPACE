@@ -23,7 +23,7 @@ export(svydesign, svrepdesign, as.svrepdesign,twophase, postStratify,
        oldsvyquantile,svyqqplot, svyqqmath, svybys, svygofchisq,
        poisson_sampling,ppscov,
        xdesign, svysmoothArea,svysmoothUnit,
-       multiframe, withCrossval)
+       multiframe, reweight, withCrossval)
 
 S3method(svyloglin,survey.design)
 S3method(svyloglin,svyrep.design)
@@ -554,5 +554,8 @@ S3method(print, dualframe)
 S3method(subset, multiframe)
 S3method(`[`, multiframe)
 S3method(svyvar, multiframe)
+
+S3method(reweight, dualframe)
+S3method(plot, dualframe_with_rewt)
 
 S3method(withCrossval, svyrep.design)
