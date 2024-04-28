@@ -82,4 +82,10 @@ mf_pps_opt<-reweight(mf_opt,theta=0.80)
 svytotal(~Lei+Feed+Tax+Clo,mf_pps_opt)
 
 
+## Targets other than totals
+mf_reg<-reweight(mf_pps,
+	targets=list(quote(vcov(svyglm(Lei~Feed+Clo, design=.DESIGN))[1,1]),
+	             quote(vcov(svytotal(~Lei,.DESIGN))))
+	)
+plot(mf_reg)	
 }

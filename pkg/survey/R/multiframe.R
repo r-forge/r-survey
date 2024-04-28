@@ -171,7 +171,7 @@ svyglm.multiframe<-function(formula, design, subset=NULL, family=stats::gaussian
     g[[1]] <- quote(glm)
     fw<-design$frame_weights*design$design_weights
     if (rescale) 
-        data$.survey.multiframe.weights <- fw/mean(fw)
+        data$.survey.multiframe.weights <- fw/mean(fw)+1e-6 
     else data$.survey.multiframe.weights <-fw
     if (any(is.na(data$.survey.prob.weights))) 
         stop("weights must not contain NA values")
