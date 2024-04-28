@@ -48,7 +48,7 @@ want to optimise for something else.
 \value{
   An object of class "dualframe_with_rewt".
   The \code{rewt} element includes the optimal thetas for each target in
-  \code{theta_opt} and the variances of each target on a grid of
+  \code{opt_thetas} and the variances of each target on a grid of
   \code{theta} in \code{variances}
 }
 
@@ -71,9 +71,13 @@ svytotal(~Lei+Feed+Tax+Clo,mf_pps)
 
 ## try to optimise
 mf_opt<-reweight(mf_pps, totals=list(~Lei, ~Feed,~Tax,~Clo))
+mf_opt$rewt$opt_thetas
 plot(mf_opt)
+
 ## a good compromise is 0.80 for everything except Tax
 ## and it's still pretty good there
+## [this is actually a bad example because Tax is missing not zero]
+##
 mf_pps_opt<-reweight(mf_opt,theta=0.80) 
 svytotal(~Lei+Feed+Tax+Clo,mf_pps_opt)
 
