@@ -105,6 +105,7 @@ print.summary.multiframe<-function(x,...){
     invisible(x)
     }
 
+weights.multiframe<-function(object, ...) object$design_weights*object$frame_weights
 
 oneframe_getdata<-function(formula, design){
     if (!inherits(formula,"formula")) stop("formula must be a formula")
@@ -129,6 +130,7 @@ multiframe_getdata<-function(formula, designs, na.rm=FALSE){
 svytotal.multiframe<-function(x,design, na.rm=FALSE,...){
     if (inherits(x,"formula"))
         x<-multiframe_getdata(x, design$designs)
+    else x<-as.matrix(x)
     if (na.rm){
         x[is.na(x)]<-0
         design$weights[!complete.cases(x)]<-0
@@ -142,7 +144,10 @@ svytotal.multiframe<-function(x,design, na.rm=FALSE,...){
 }
 
 svymean.multiframe<-function(x, design, na.rm=FALSE,...){
-    x<-multiframe_getdata(x, design$designs)
+    if (inherits(x,"formula"))
+        x<-multiframe_getdata(x, design$designs)
+    else
+        x<-as.matrix(x)
     if (na.rm){
         x[is.na(x)]<-0
         design$weights[!complete.cases(x)]<-0
@@ -279,9 +284,36 @@ subset.multiframe<-function (x, subset, ...)
 }
 
 
-svyvar.multiframe<-function(x,...) {
-    warning("FIXME in svyvar.multiframe")
-    42
+svyvar.multiframe<-function(x,design, na.rm=FALSE, ...) {
+    if (inherits(x,"formula"))
+        x<-multiframe_getdata(x, design$designs)
+    n <- sum((design$design_weights*design$frame_weights != 0) &
+             (rowSums(is.na(as.matrix(x))) ==  0))
+    xbar <- svymean(x, design, na.rm = na.rm)
+    if (NCOL(x) == 1) {
+        if (n == 1) {
+            v <- NA
+            attr(v, "statistic") <- NA
+            attr(v, "var") <- NA
+            class(v) <- "svystat"
+            return(v)
+        }
+        x <- x - xbar
+        v <- svymean(x * x * n/(n - 1), design, na.rm = na.rm)
+        attr(v, "statistic") <- "variance"
+        return(v)
+    }
+    x <- t(t(x) - xbar)
+    p <- NCOL(x)
+    a <- matrix(rep(x, p), ncol = p * p)
+    b <- x[, rep(1:p, each = p)]
+    v <- svymean(a * b * n/(n - 1), design, na.rm = na.rm)
+    vv <- matrix(v, ncol = p)
+    dimnames(vv) <- list(names(xbar), names(xbar))
+    attr(vv, "var") <- attr(v, "var")
+    attr(vv, "statistic") <- "variance"
+    class(vv) <- c("svyvar", "svystat")
+    vv
     }
 
 reweight<-function(design,...) UseMethod("reweight")

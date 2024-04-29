@@ -3,7 +3,7 @@
 
 	Initial version of multiframe() for dual-frame sampling and
 	reweight() for optimising frame weights. Methods for svytotal,
-	svymean, svyglm.
+	svymean, svyglm, svyvar.
 
 	Initial version of withCrossval() for cross-validation
 

@@ -1231,7 +1231,7 @@ residuals.svyglm<-function(object,type = c("deviance", "pearson", "working",
    	   y <- object$y
 	   mu <- object$fitted.values
     	   wts <- object$prior.weights
-           pwts<- 1/object$survey.design$prob
+           pwts<- weights(object$survey.design, "sampling")
            pwts<- pwts/mean(pwts)
            ## missing values in calibrated/post-stratified designs
            ## the rows will still be in the design object but not in the model
