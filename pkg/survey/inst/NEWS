@@ -1,7 +1,9 @@
 4.4-3	options(survey.lonely.psu="adjust") needed strata to be a factor or numeric
 	(for Richard Li, Durga Nagori)
 
-	Initial version of multiframe() for dual-frame sampling
+	Initial version of multiframe() for dual-frame sampling and
+	reweight() for optimising frame weights. Methods for svytotal,
+	svymean, svyglm.
 
 	Initial version of withCrossval() for cross-validation
 
