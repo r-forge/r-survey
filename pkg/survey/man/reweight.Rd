@@ -67,7 +67,7 @@ Ades_pps <-svydesign(id=~1, fpc=~ProbA,data=DatA,pps=ppsmat(PiklA))
 
 ## Not very good weighting
 mf_pps<-multiframe(list(Ades_pps,Bdes_pps),list(A_in_frames,B_in_frames),theta=0.5) 
-svytotal(~Lei+Feed+Tax+Clo,mf_pps)
+svytotal(~Lei+Feed+Tax+Clo,mf_pps, na.rm=TRUE)
 
 ## try to optimise
 mf_opt<-reweight(mf_pps, totals=list(~Lei, ~Feed,~Tax,~Clo))
@@ -76,10 +76,9 @@ plot(mf_opt)
 
 ## a good compromise is 0.80 for everything except Tax
 ## and it's still pretty good there
-## [this is actually a bad example because Tax is missing not zero]
-##
+## (Tax will be biased because it's missing for landline-only)
 mf_pps_opt<-reweight(mf_opt,theta=0.80) 
-svytotal(~Lei+Feed+Tax+Clo,mf_pps_opt)
+svytotal(~Lei+Feed+Tax+Clo,mf_pps_opt, na.rm=TRUE)
 
 
 ## Targets other than totals

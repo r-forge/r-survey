@@ -14,10 +14,12 @@
    \item{Feed}{Feeding expenses (in euros) at the househould}
    \item{Clo}{Clothing expenses (in euros) at the household}
    \item{Lei}{Leisure expenses (in euros) at the household}
-   \item{Inc}{Household income (in euros). Values for this variable are only available for households included in frame A. For households included in domain b, value of this variable is set to 0.}
-   \item{Tax}{Household municipal taxes (in euros) paid. Values for this variable are only available for households included in frame A. For households included in domain b, value of this variable is set to 0.}
-   \item{M2}{Square meters of the house. Values for this variable are only available for households included in frame B. For households included in domain a, value of this variable is set to 0.}
-   \item{Size}{Household size. Values for this variable are only available for households included in frame B. For households included in domain a, value of this variable is set to 0.}
+   \item{Inc}{Household income (in euros). Values for this variable are only available for households included in frame A. For households included in domain b, value of this variable is missing}
+   \item{Tax}{Household municipal taxes (in euros) paid. Values for this
+     variable are only available for households included in frame A. For
+     households included in domain b, value of this variable is missing}
+   \item{M2}{Square meters of the house. Values for this variable are only available for households included in frame B. For households included in domain a, value of this variable is missing}
+   \item{Size}{Household size. Values for this variable are only available for households included in frame B. For households included in domain a, value of this variable is missing}
    \item{ProbA}{First order inclusion probability in frame A. This probability is 0 for households included in domain b.}
    \item{ProbB}{First order inclusion probability in frame B. This probability is 0 for households included in domain a.}
    \item{Stratum}{A numeric value indicating the stratum each household belongs to.}
