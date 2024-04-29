@@ -129,7 +129,10 @@ multiframe_getdata<-function(formula, designs, na.rm=FALSE){
 svytotal.multiframe<-function(x,design, na.rm=FALSE,...){
     if (inherits(x,"formula"))
         x<-multiframe_getdata(x, design$designs)
-    
+    if (na.rm){
+        x[is.na(x)]<-0
+        design$weights[!complete.cases(x)]<-0
+        }
     total<-colSums(x*design$frame_weights*design$design_weights)
     V<-multiframevar(x*design$frame_weights*design$design_weights, design$dchecks)
     attr(total,"var")<-V
@@ -140,6 +143,10 @@ svytotal.multiframe<-function(x,design, na.rm=FALSE,...){
 
 svymean.multiframe<-function(x, design, na.rm=FALSE,...){
     x<-multiframe_getdata(x, design$designs)
+    if (na.rm){
+        x[is.na(x)]<-0
+        design$weights[!complete.cases(x)]<-0
+    }
     fw<-design$frame_weights*design$design_weights
     mean<-colSums(x[,drop=FALSE]*fw)/sum(fw)
     inf_fun<-sweep(x,2, mean)/sum(fw)
@@ -332,8 +339,8 @@ reweight.dualframe<-function(design, targets=NULL, totals=NULL,
         stop("for estimator='constant', must provide exactly one of targets, totals, and theta")
 
     if (!is.null(totals)){
-        targets<-lapply(totals, function(formula) bquote(vcov(svytotal(.(formula), design=.DESIGN))))
-
+        targets<-lapply(totals,
+                        function(formula) bquote(vcov(svytotal(.(formula), design=.DESIGN,na.rm=TRUE))))
         }
     if(!is.null(design$theta))
         theta_old<-design$theta
