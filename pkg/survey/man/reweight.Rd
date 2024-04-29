@@ -47,8 +47,9 @@ want to optimise for something else.
 }
 \value{
   An object of class "dualframe_with_rewt".
-  The \code{rewt} element includes the optimal thetas for each target in
-  \code{opt_thetas} and the variances of each target on a grid of
+  
+  The \code{coef} method returns the optimal theta for each target.
+  The \code{rewt} element includes the variances of each target on a grid of
   \code{theta} in \code{variances}
 }
 
@@ -71,7 +72,7 @@ svytotal(~Lei+Feed+Tax+Clo,mf_pps, na.rm=TRUE)
 
 ## try to optimise
 mf_opt<-reweight(mf_pps, totals=list(~Lei, ~Feed,~Tax,~Clo))
-mf_opt$rewt$opt_thetas
+coef(mf_opt)
 plot(mf_opt)
 
 ## a good compromise is 0.80 for everything except Tax
@@ -86,5 +87,6 @@ mf_reg<-reweight(mf_pps,
 	targets=list(quote(vcov(svyglm(Lei~Feed+Clo, design=.DESIGN))[1,1]),
 	             quote(vcov(svytotal(~Lei,.DESIGN))))
 	)
-plot(mf_reg)	
+plot(mf_reg,type="l")
+legend("topright",bty="n",lty=1:2,col=1:2, legend=c("regression","total"))
 }

@@ -557,5 +557,6 @@ S3method(svyvar, multiframe)
 
 S3method(reweight, dualframe)
 S3method(plot, dualframe_with_rewt)
+S3method(coef, dualframe_with_rewt)
 
 S3method(withCrossval, svyrep.design)

@@ -383,6 +383,8 @@ reweight.dualframe<-function(design, targets=NULL, totals=NULL,
     rval
 }
 
+coef.dualframe_with_rewt<-function(object, ...) object$rewt$opt_thetas
+
 plot.dualframe_with_rewt<-function(x,y,type="b",...){
     ntargets<-length(x$rewt$targets)
     scaled_vars<-vector("list",ntargets)
