@@ -42,7 +42,7 @@ withCrossval(design, formula, trainfun, testfun, loss = c("RMSE",
     Should the predictor matrix have an intercept added?
   }
   \item{tuning}{vector of tuning parameters, such as the regularisation
-    parameter in information criteria. \code{trainfun} and
+    parameter in information criteria or the number of predictors. \code{trainfun} and
     \code{testfun} will be called with each element of this vector in
     turn. Use any single-element vector if no tuning parameter is needed}
   \item{\dots}{

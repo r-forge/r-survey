@@ -11,6 +11,9 @@
 
 	add "pps_spec" virtual class for all the PPS sparse matrix things
 
+	support calibration to the influence functions of a phase-1 model in calibrate.twophase and
+	calibrate.twophase2 (currently only with simple random sampling at phase 1)
+
 4.4-2	Invalid read in C++ code, found by Brian Ripley, fixed by Ben Schneider
 
 	Updated small-area vignette (Peter Gao)

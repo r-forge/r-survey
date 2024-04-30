@@ -40,7 +40,7 @@ withCrossval.svyrep.design<-function(design, formula, trainfun, testfun,
             is_test<-testset[,fold]
             is_train<-!testset[,fold]
             w<-repweights[,fold]
-            fit<-trainfun(X[is_train,,drop=FALSE], y[is_train],w[is_train],tuning=tuning[i])
+            fit<-trainfun(X[is_train,,drop=FALSE], y[is_train], w[is_train], tuning=tuning[i])
             hat[is_test,fold]<-testfun(X[is_test,], trainfit=fit,tuning=tuning[i])
         }
         ## should be using rscales,scale to do the scaling here
