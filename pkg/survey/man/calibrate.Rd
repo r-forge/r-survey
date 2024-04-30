@@ -176,6 +176,9 @@ cal_names(formula,design,...)
   \code{method="approx"} argument to \code{\link{twophase}}, calibration of the first
   phase of sampling to the population is not supported.
 
+  In a two-phase design, \code{formula} may be a glm or lm or coxph
+  model fitted to the phase-one data. Calibration will be done using the
+  influence functions of this model as the calibration variables.
 
 }
 \value{

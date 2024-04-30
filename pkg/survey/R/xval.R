@@ -2,7 +2,7 @@
 
 withCrossval <- function(design, formula, trainfun, testfun,
                          loss=c("RMSE","entropy","AbsError","Gini"),
-                         intercept, ...){
+                         intercept,tuning=NULL, ...){
     UseMethod("withCrossval")
 }
 
@@ -12,7 +12,7 @@ withCrossval <- function(design, formula, trainfun, testfun,
 ##
 withCrossval.svyrep.design<-function(design, formula, trainfun, testfun,
                                      loss=c("RMSE","entropy","AbsError","Gini"),
-                                     intercept,nearly_zero=1e-4,...){
+                                     intercept, tuning, nearly_zero=1e-4,...){
 
     if (is.character(loss)) {
         loss<-match.arg(loss)
@@ -33,21 +33,25 @@ withCrossval.svyrep.design<-function(design, formula, trainfun, testfun,
     X<-model.matrix(formula, mf)
         
     hat<-matrix(NA, ncol=ncol(repweights),nrow=nrow(repweights))
+    losses<-numeric(length(tuning))
 
-    for(fold in 1:ncol(repweights)){
-        is_test<-testset[,fold]
-        is_train<-!testset[,fold]
-        w<-repweights[,fold]
-        fit<-trainfun(X[is_train,,drop=FALSE], y[is_train],w[is_train])
-        hat[is_test,fold]<-testfun(X[is_test,], trainfit=fit)
+    for(i in 1:length(tuning)){
+        for(fold in 1:ncol(repweights)){
+            is_test<-testset[,fold]
+            is_train<-!testset[,fold]
+            w<-repweights[,fold]
+            fit<-trainfun(X[is_train,,drop=FALSE], y[is_train],w[is_train],tuning=tuning[i])
+            hat[is_test,fold]<-testfun(X[is_test,], trainfit=fit,tuning=tuning[i])
+        }
+        ## should be using rscales,scale to do the scaling here
+        ## cf svrVar
+        loss<-0
+        for(fold in 1:ncol(hat)){
+            noNA<-!is.na(hat[,fold])
+            loss<-loss+lossfun(y[noNA],hat[noNA,fold],pweights[noNA])
+        }
+        losses[i]<-loss/ncol(hat)
     }
-
-    ## should be using rscales,scale to do the scaling here
-    ## cf svrVar
-    loss<-0
-    for(fold in 1:ncol(hat)){
-        noNA<-!is.na(hat[,fold])
-        loss<-loss+lossfun(y[noNA],hat[noNA,fold],pweights[noNA])
-    }
-    loss/ncol(hat)
+    losses
 }
+
