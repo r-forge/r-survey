@@ -12,7 +12,8 @@
   level; bootstrap weights are similar to bootstrapping for cross-validation.
 }
 \usage{
-withCrossval(design, formula, trainfun, testfun, loss = c("RMSE", "entropy", "AbsError", "Gini"), intercept, ...)
+withCrossval(design, formula, trainfun, testfun, loss = c("RMSE",
+"entropy", "AbsError", "Gini"), intercept, tuning, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -26,7 +27,8 @@ withCrossval(design, formula, trainfun, testfun, loss = c("RMSE", "entropy", "Ab
   }
   \item{trainfun}{
     Function taking a predictor matrix \code{X}, an outcome vector
-    \code{y}, and a weights vector \code{w} and training a model that is
+    \code{y},  a weights vector \code{w}, and an element of
+    \code{tuning}, and training a model that is
     returned as some R object.
   }
   \item{testfun}{
@@ -39,6 +41,10 @@ withCrossval(design, formula, trainfun, testfun, loss = c("RMSE", "entropy", "Ab
   \item{intercept}{
     Should the predictor matrix have an intercept added?
   }
+  \item{tuning}{vector of tuning parameters, such as the regularisation
+    parameter in information criteria. \code{trainfun} and
+    \code{testfun} will be called with each element of this vector in
+    turn. Use any single-element vector if no tuning parameter is needed}
   \item{\dots}{
     future expansion
   }
@@ -50,7 +56,7 @@ A number
 \references{
 Iparragirre, A., Lumley, T., Barrio, I., & Arostegui, I. (2023).
 Variable selection with LASSO regression for complex survey data.
-Stat, 12(1), e578. \url{https://doi.org/10.1002/sta4.578}
+Stat, 12(1), e578. 
 }
 
 
@@ -59,12 +65,37 @@ Stat, 12(1), e578. \url{https://doi.org/10.1002/sta4.578}
 }
 \examples{
 data(api)
-rclus1<-as.svrepdesign(svydesign(id=~dnum, weights=~pw, data=apiclus1, fpc=~fpc))
+rclus1<-as.svrepdesign(svydesign(id=~dnum, weights=~pw, data=apiclus1,
+fpc=~fpc))
 
 
 withCrossval(rclus1, api00~api99+ell+stype,
-  trainfun=function(X,y,w) lm.wfit(X,y,w),
-  testfun=function(X, trainfit) X\%*\%coef(trainfit),
-  intercept=TRUE,loss="RMSE")
+  trainfun=function(X,y,w,tuning) lm.wfit(X,y,w),
+  testfun=function(X, trainfit,tuning) X\%*\%coef(trainfit),
+  intercept=TRUE,loss="RMSE",tuning=1)
+
+
+## More realistic example using lasso
+## tuning parameter is number of variables in model
+##
+##  library(glmnet)
+##  ftrain=function(X,y,w,tuning) {
+##   	m<-glmnet(X,y,weights=w)
+##   	lambda<-m$lambda[min(which(m$df>=tuning))]
+## 	list(m,lambda)
+##   	}
+##   ftest=function(X, trainfit, tuning){
+##   	predict(trainfit[[1]], newx=X, s=trainfit[[2]])
+##   }
+##
+##  withCrossval(rclus1, api00~api99+ell+stype+mobility+enroll,
+##    trainfun=ftrain,
+##    testfun=ftest,
+##    intercept=FALSE,loss="RMSE",
+##    tuning=0:3)
+##
+## [1] 109.67451 100.44726  27.62414  27.54160
+## Models with two or three predictors are about equally good
+
 
 }

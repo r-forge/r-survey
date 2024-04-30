@@ -672,6 +672,15 @@ calibrate.twophase2<-function(design, phase=2, formula, population,
             return(design)
         }
             
+        if(!inherits(formula,"formula")){
+            if (inherits(formula, "glm") || inherits(formula, "coxph") || inherits(formula, "lm")){
+                if (is.character(calfun))
+                    calfun<-switch(calfun,linear=cal.linear, raking=cal.raking, logit=cal.logit)
+                rval<-inf_calibrate(design, working_model=formula, add_mat=NULL,
+                                    calfun=calfun,...)
+                return(rval)
+            }
+        }
         if (missing(population) || is.null(population)){
             ## calibrate to phase 1 totals
             population<-colSums(model.matrix(formula,
