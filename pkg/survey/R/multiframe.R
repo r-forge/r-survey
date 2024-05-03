@@ -438,3 +438,4 @@ plot.dualframe_with_rewt<-function(x,y,type="b",...){
 }
 
 reweight.multiframe<-function(design, ...) stop("multi-frame reweighting under construction")
+

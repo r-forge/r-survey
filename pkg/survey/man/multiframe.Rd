@@ -10,7 +10,7 @@ about which observations are in which frame, constructs an object
 representing the whole multi-frame sample. If an unit is in the
 overlap of multiple frames in the population it is effectively split
 into multiple separate units and so the weight is split if it is
-sampled. 
+sampled. To optimise the split of frame weights, see \code{\link{reweight}}
 }
 \usage{
 multiframe(designs, overlaps, estimator = c("constant", "expected"), theta = NULL)
@@ -61,7 +61,7 @@ Kalton, G. and Anderson, D. W. (1986) Sampling Rare Populations. Journal of the 
 }
 
 \seealso{
-  \code{\link{svydesign}}
+  \code{\link{svydesign}}, \code{\link{reweight}}
 
   For a simple introduction:
   Metcalf P and Scott AJ (2009) Using multiple frames in health
@@ -86,4 +86,6 @@ svytotal(~Lei,mf_pps)
 svymean(~Lei, mf_pps)
 
 svyby(~Lei, ~Size, svymean, design=mf_pps)
+svytable(~Size+I(Lei>20), mf_pps,round=TRUE)
+
 }
