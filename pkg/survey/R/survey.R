@@ -868,8 +868,7 @@ svytable<-function(formula, design, ...){
 
 svytable.survey.design<-function(formula, design, Ntotal=NULL, round=FALSE,...){
   
-  if (!inherits(design,"survey.design")) stop("design must be a survey design")
-  weights<-1/design$prob
+  weights<-weights(design,"sampling")
   
   ## unstratified or unadjusted
   if (length(Ntotal)<=1 || !design$has.strata){
@@ -909,6 +908,10 @@ svytable.survey.design<-function(formula, design, Ntotal=NULL, round=FALSE,...){
   attr(tbl, "call")<-match.call()
   tbl
 }
+
+
+svytable.multiframe<-svytable.survey.design
+
 
 svycoxph<-function(formula,design,subset=NULL,rescale=TRUE,...){
   .svycheck(design)
