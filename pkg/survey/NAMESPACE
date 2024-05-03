@@ -555,6 +555,7 @@ S3method(subset, multiframe)
 S3method(`[`, multiframe)
 S3method(svyvar, multiframe)
 S3method(weights, multiframe)
+S3method(model.frame, multiframe)
 
 S3method(reweight, dualframe)
 S3method(plot, dualframe_with_rewt)

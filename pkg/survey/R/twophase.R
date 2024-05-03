@@ -803,7 +803,7 @@ inf_calibrate<-function(design, working_model,add_mat=NULL, calfun, bounds=list(
 
     hsamp<-h[design$subset,,drop=FALSE]
     tqr<-qr(hsamp*whalf)
-    g <- survey:::grake(hsamp, weights(design), calfun, bounds = bounds, population = population, 
+    g <- grake(hsamp, weights(design), calfun, bounds = bounds, population = population, 
         verbose = verbose, epsilon = epsilon, maxit = maxit)
     if (!is.null(attr(g, "failed"))) {
         if (!force) 

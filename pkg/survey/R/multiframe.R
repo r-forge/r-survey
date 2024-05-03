@@ -127,6 +127,13 @@ multiframe_getdata<-function(formula, designs, na.rm=FALSE){
     do.call(rbind,datas)
 }
 
+model.frame.multiframe<-function(formula,...){
+    nm<-colnames(formula)
+    datas<-lapply(formula$designs, model.frame, ...)
+    common<-lapply(datas, function(d) d[,nm,drop=FALSE])
+    do.call(rbind,common)              
+}
+
 svytotal.multiframe<-function(x,design, na.rm=FALSE,...){
     if (inherits(x,"formula"))
         x<-multiframe_getdata(x, design$designs)

@@ -40,7 +40,7 @@ from frame k. (weights if all >=1, probabilities if all <=1)
 }
 \details{
 It is not necessary that the frame samples contain exactly the same
-variables, although only variables present in all the samples can be
+variables or that they are in the same order, although only variables present in all the samples can be
 used.  It is important that factor variables existing across more than
 one frame sample have the same factor levels in all the samples. 
   
@@ -85,5 +85,5 @@ mf_pps<-multiframe(list(Ades_pps,Bdes_pps),list(A_in_frames,B_in_frames),theta=0
 svytotal(~Lei,mf_pps)
 svymean(~Lei, mf_pps)
 
-
+svyby(~Lei, ~Size, svymean, design=mf_pps)
 }
