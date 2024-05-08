@@ -141,7 +141,7 @@ svychisq.survey.design<-function(formula, design,
   
 }
 
-svychisq.twophase<-function(formula, design,
+svychisq.twophase<-surveychisq.twophase2<-function(formula, design,
                    statistic=c("F","Chisq","Wald","adjWald","lincom","saddlepoint"),
                    na.rm=TRUE,...){
   if (ncol(attr(terms(formula),"factors"))!=2)

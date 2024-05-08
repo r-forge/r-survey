@@ -124,6 +124,7 @@ S3method(svychisq, survey.design)
 S3method(svychisq, svyrep.design)
 S3method(svychisq, DBIsvydesign)
 S3method(svychisq, twophase)
+S3method(svychisq, twophase2)
 
 S3method(svykappa, default)
 S3method(svykappa, DBIsvydesign)
