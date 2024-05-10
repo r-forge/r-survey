@@ -91,9 +91,9 @@ mf_reg<-reweight(mf_pps,
 plot(mf_reg,type="l")
 legend("topright",bty="n",lty=1:2,col=1:2, legend=c("regression","total"))
 
-## Zooming in on optimality for a particular variable
+## Zooming in on optimality for a particular variable (for compatibility)
 mf_opt1<-reweight(mf_pps, totals=list(~Lei),theta_grid=seq(0.7,0.9,length=100))
-coef(mf_opt1) # Hartley's method gives 0.8028
+coef(mf_opt1) # Frames2::Hartley gives 0.802776
 
 
 }
