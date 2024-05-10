@@ -15,7 +15,7 @@ compromise-optimal set of frame weights can be chosen
 reweight(design, ...)
 \method{reweight}{dualframe}(design, targets=NULL, totals=NULL,
                              estimator=c("constant","expected"),
-                             theta=NULL, ...)
+                             theta=NULL, theta_grid=seq(0,1,by=0.05),...)
 \method{plot}{dualframe_with_rewt}(x,y,type="b",...)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -32,6 +32,7 @@ dual-frame or multiframe design object
   times a unit is sampled and is not optimisable.}
 \item{theta}{As in \code{\link{multiframe}}, a fixed weight for
   observations in frame 1 also sampled in frame 2}
+\item{theta_grid}{Grid for optimising theta over, with \code{estimator="constant"}}
 \item{x}{object produced by \code{reweight}}
 \item{y}{ignored}
   \item{type,\dots}{
@@ -89,4 +90,10 @@ mf_reg<-reweight(mf_pps,
 	)
 plot(mf_reg,type="l")
 legend("topright",bty="n",lty=1:2,col=1:2, legend=c("regression","total"))
+
+## Zooming in on optimality for a particular variable
+mf_opt1<-reweight(mf_pps, totals=list(~Lei),theta_grid=seq(0.7,0.9,length=100))
+coef(mf_opt1) # Hartley's method gives 0.8028
+
+
 }
