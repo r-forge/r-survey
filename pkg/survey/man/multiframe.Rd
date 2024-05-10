@@ -45,7 +45,8 @@ used.  It is important that factor variables existing across more than
 one frame sample have the same factor levels in all the samples. 
   
 All these estimators assume sampling is independent between frames, and that
-any observation sampled more than once is present multiple times in the data.
+any observation sampled more than once is present in the dataset each time
+it is sampled.
   }
 \value{
 Object of class \code{multiframe}

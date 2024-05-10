@@ -81,7 +81,7 @@ svymean(~Lei,MSdesign)
 
 }
 \seealso{
-  \code{\link{multiframe}}
+  \code{\link{multiframe}}, \code{\link{reweight}}
 
 Original package: \url{https://CRAN.R-project.org/package=Frames2}
 }
