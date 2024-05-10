@@ -6,7 +6,7 @@
 svychisq<-function(formula, design,...) UseMethod("svychisq",design)
 
 
-svychisq.survey.design<-function(formula, design,
+svychisq.survey.design<-svychisq.multiframe<-function(formula, design,
                    statistic=c("F","Chisq","Wald","adjWald","lincom","saddlepoint","wls-score"),
                    na.rm=TRUE,...){
   if (ncol(attr(terms(formula),"factors"))!=2)

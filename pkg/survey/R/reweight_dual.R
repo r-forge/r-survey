@@ -2,7 +2,8 @@
 reweight<-function(design,...) UseMethod("reweight")
 
 reweight.dualframe<-function(design, targets=NULL, totals=NULL,
-                             estimator=c("constant","expected"), theta=NULL, ...) {
+                             estimator=c("constant","expected"), theta=NULL,
+                             theta_grid=seq(0,1,by=0.05),...) {
     
     estimator<-match.arg(estimator)
     nframes<-length(design$designs)
@@ -62,7 +63,6 @@ reweight.dualframe<-function(design, targets=NULL, totals=NULL,
     else
         theta_old<-1/length(design$designs)
     
-    theta_grid<-seq(0,1,by=0.05)
     ntargets<-length(targets)
     nthetas<-length(theta_grid)
     variances<-lapply(1:ntargets, function(x) numeric(nthetas))   
@@ -103,9 +103,15 @@ coef.dualframe_with_rewt<-function(object, ...) object$rewt$opt_thetas
 plot.dualframe_with_rewt<-function(x,y,type="b",...){
     ntargets<-length(x$rewt$targets)
     scaled_vars<-vector("list",ntargets)
+    
+    if((x$rewt$theta_old < min(x$rewt$theta)) || (x$rewt$theta_old > max(x$rewt$theta)))
+        theta_old<-median(x$rewt$theta)
+    else
+        theta_old<-x$rewt$theta_old
+    
     for(i in 1:ntargets){
         fn<-approxfun(x$rewt$theta, x$rewt$variances[[i]])
-        old_var<-fn(x$rewt$theta_old)
+        old_var<-fn(theta_old)
         scaled_vars[[i]]<-x$rewt$variances[[i]]/old_var
     }
     matplot(x$rewt$theta, do.call(cbind,scaled_vars),type=type,xlab="theta",ylab="Scaled variance",...)

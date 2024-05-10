@@ -336,4 +336,3 @@ svyvar.multiframe<-function(x,design, na.rm=FALSE, ...) {
 }
 
 
-svychisq.multiframe<-svychisq.survey.design
