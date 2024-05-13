@@ -2,22 +2,20 @@
 
 withCrossval <- function(design, formula, trainfun, testfun,
                          loss=c("RMSE","entropy","AbsError","Gini"),
-                         intercept,tuning=NULL, ...){
+                         intercept,tuning=NULL, nearly_zero=1e-4,...){
     UseMethod("withCrossval")
 }
 
-## need to consider BRR and bootstrap which leave a given obs out more than once
-##  want to allow multiple values of tuning parameter in single call to train/test, eg for lasso
-## also, for JKn we will want to cluster the repweights to keep the number down. 
+## we may want to cluster the repweights to keep the number down. 
 ##
 withCrossval.svyrep.design<-function(design, formula, trainfun, testfun,
-                                     loss=c("RMSE","entropy","AbsError","Gini"),
+                                     loss=c("MSE","entropy","AbsError","Gini"),
                                      intercept, tuning, nearly_zero=1e-4,...){
 
     if (is.character(loss)) {
         loss<-match.arg(loss)
-        lossfun<-switch(loss, RMSE=function(y,hat,w) sqrt(sum(w*(y-hat)^2)/sum(w)),
-                        AbsError=function(y,hat,w) sum(w*abs((y-hat)))/sum(w), entropy=,
+        lossfun<-switch(loss, MSE=function(y,hat,w) sum(w*(y-hat)^2)/sum(w),
+                        AbsError=, entropy=,
                         Gini=stop(paste(loss, "not yet implemented")))
     } else if (!is.function(loss)){
         lossfun<-loss
@@ -27,6 +25,8 @@ withCrossval.svyrep.design<-function(design, formula, trainfun, testfun,
     pweights<-weights(design,"sampling")
 
     testset<- (repweights/pweights)<= nearly_zero
+    if (any(colSums(testset)==0))
+        stop("some replicates have no test-set observations. Check nearly_zero.")
     
     mf<-model.frame(formula, model.frame(design))
     y<-model.response(mf)
@@ -48,10 +48,11 @@ withCrossval.svyrep.design<-function(design, formula, trainfun, testfun,
         loss<-0
         for(fold in 1:ncol(hat)){
             noNA<-!is.na(hat[,fold])
-            loss<-loss+lossfun(y[noNA],hat[noNA,fold],pweights[noNA])
+            loss<-loss+lossfun(y[noNA],hat[noNA,fold],pweights[noNA])*design$rscales[fold]
         }
-        losses[i]<-loss/ncol(hat)
+        losses[i]<-loss*design$scale
     }
+
     losses
 }
 

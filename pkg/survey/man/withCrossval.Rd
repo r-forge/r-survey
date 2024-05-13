@@ -12,8 +12,8 @@
   level; bootstrap weights are similar to bootstrapping for cross-validation.
 }
 \usage{
-withCrossval(design, formula, trainfun, testfun, loss = c("RMSE",
-"entropy", "AbsError", "Gini"), intercept, tuning, ...)
+withCrossval(design, formula, trainfun, testfun, loss = c("MSE",
+"entropy", "AbsError", "Gini"), intercept, tuning,  nearly_zero=1e-4,...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -44,7 +44,10 @@ withCrossval(design, formula, trainfun, testfun, loss = c("RMSE",
   \item{tuning}{vector of tuning parameters, such as the regularisation
     parameter in information criteria or the number of predictors. \code{trainfun} and
     \code{testfun} will be called with each element of this vector in
-    turn. Use any single-element vector if no tuning parameter is needed}
+    turn. Use any single-element vector if no tuning parameter is
+    needed}
+  \item{nearly_zero}{test-set threshold on the scale of replicate weight
+  divided by sampling weight.}
   \item{\dots}{
     future expansion
   }
@@ -91,10 +94,10 @@ withCrossval(rclus1, api00~api99+ell+stype,
 ##  withCrossval(rclus1, api00~api99+ell+stype+mobility+enroll,
 ##    trainfun=ftrain,
 ##    testfun=ftest,
-##    intercept=FALSE,loss="RMSE",
+##    intercept=FALSE,loss="MSE",
 ##    tuning=0:3)
 ##
-## [1] 109.67451 100.44726  27.62414  27.54160
+## [1] 187112.45 156936.67  12524.42  12396.34
 ## Models with two or three predictors are about equally good
 
 
