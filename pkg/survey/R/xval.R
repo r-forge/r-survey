@@ -1,7 +1,7 @@
 
 
 withCrossval <- function(design, formula, trainfun, testfun,
-                         loss=c("RMSE","entropy","AbsError","Gini"),
+                         loss=c("MSE","entropy","AbsError","Gini"),
                          intercept,tuning=NULL, nearly_zero=1e-4,...){
     UseMethod("withCrossval")
 }
@@ -43,8 +43,7 @@ withCrossval.svyrep.design<-function(design, formula, trainfun, testfun,
             fit<-trainfun(X[is_train,,drop=FALSE], y[is_train], w[is_train], tuning=tuning[i])
             hat[is_test,fold]<-testfun(X[is_test,], trainfit=fit,tuning=tuning[i])
         }
-        ## should be using rscales,scale to do the scaling here
-        ## cf svrVar
+
         loss<-0
         for(fold in 1:ncol(hat)){
             noNA<-!is.na(hat[,fold])
