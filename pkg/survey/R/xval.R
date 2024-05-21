@@ -1,7 +1,7 @@
 
 
 withCrossval <- function(design, formula, trainfun, testfun,
-                         loss=c("MSE","entropy","AbsError","Gini"),
+                         loss=c("MSE","entropy","AbsError"),
                          intercept,tuning=NULL, nearly_zero=1e-4,...){
     UseMethod("withCrossval")
 }
@@ -9,14 +9,14 @@ withCrossval <- function(design, formula, trainfun, testfun,
 ## we may want to cluster the repweights to keep the number down. 
 ##
 withCrossval.svyrep.design<-function(design, formula, trainfun, testfun,
-                                     loss=c("MSE","entropy","AbsError","Gini"),
+                                     loss=c("MSE","entropy","AbsError"),
                                      intercept, tuning, nearly_zero=1e-4,...){
 
     if (is.character(loss)) {
         loss<-match.arg(loss)
-        lossfun<-switch(loss, MSE=function(y,hat,w) sum(w*(y-hat)^2)/sum(w),
-                        AbsError=, entropy=,
-                        Gini=stop(paste(loss, "not yet implemented")))
+        lossfun<-switch(loss, MSE=function(y,hat,w) sum(w*(y-hat)^2),
+                        AbsError=function(y,hat,w) sum(w*abs(y-hat)),
+                        entropy=function(y, hat, w) sum(w*(y*log(hat)+(1-y)*log(1-hat))))
     } else if (!is.function(loss)){
         lossfun<-loss
     }
@@ -52,6 +52,6 @@ withCrossval.svyrep.design<-function(design, formula, trainfun, testfun,
         losses[i]<-loss*design$scale
     }
 
-    losses
+    losses/sum(pweights)
 }
 

@@ -13,7 +13,7 @@
 }
 \usage{
 withCrossval(design, formula, trainfun, testfun, loss = c("MSE",
-"entropy", "AbsError", "Gini"), intercept, tuning,  nearly_zero=1e-4,...)
+"entropy", "AbsError"), intercept, tuning,  nearly_zero=1e-4,...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -75,7 +75,7 @@ fpc=~fpc))
 withCrossval(rclus1, api00~api99+ell+stype,
   trainfun=function(X,y,w,tuning) lm.wfit(X,y,w),
   testfun=function(X, trainfit,tuning) X\%*\%coef(trainfit),
-  intercept=TRUE,loss="RMSE",tuning=1)
+  intercept=TRUE,loss="MSE",tuning=1)
 
 
 ## More realistic example using lasso
@@ -97,7 +97,8 @@ withCrossval(rclus1, api00~api99+ell+stype,
 ##    intercept=FALSE,loss="MSE",
 ##    tuning=0:3)
 ##
-## [1] 187112.45 156936.67  12524.42  12396.34
+## [1] 11445.2379  9649.1150   800.0742   787.4171
+##
 ## Models with two or three predictors are about equally good
 
 
