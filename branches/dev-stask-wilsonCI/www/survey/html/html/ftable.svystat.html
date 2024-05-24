@@ -1,0 +1,92 @@
+<html><head><title>R: Lay out tables of survey statistics</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../R.css">
+</head><body>
+
+<table width="100%" summary="page for ftable.svystat {survey}"><tr><td>ftable.svystat {survey}</td><td align="right">R Documentation</td></tr></table>
+<h2>Lay out tables of survey statistics</h2>
+
+
+<h3>Description</h3>
+
+<p>
+Reformat the output of survey computations to a table.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'svystat':
+ftable(x, rownames,...)
+## S3 method for class 'svrepstat':
+ftable(x, rownames,...)
+## S3 method for class 'svyby':
+ftable(x,...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+Output of functions such as <code>svymean</code>,<code>svrepmean</code>, <code>svyby</code></td></tr>
+<tr valign="top"><td><code>rownames</code></td>
+<td>
+List of vectors of strings giving dimension names for
+the resulting table (see examples)</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+Arguments for future expansion</td></tr>
+</table>
+
+<h3>Value</h3>
+
+<p>
+An object of class <code>"ftable"</code></p>
+
+<h3>See Also</h3>
+
+<p>
+<code><a href="../../stats/html/ftable.html">ftable</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+data(api)
+dclus1&lt;-svydesign(id=~dnum, weights=~pw, data=apiclus1, fpc=~fpc)
+
+a&lt;-svymean(~interaction(stype,comp.imp), design=dclus1)
+b&lt;-ftable(a, rownames=list(stype=c("E","H","M"),comp.imp=c("No","Yes")))
+b
+round(100*b,1)
+
+a&lt;-svymean(~interaction(stype,comp.imp), design=dclus1, deff=TRUE)
+b&lt;-ftable(a, rownames=list(stype=c("E","H","M"),comp.imp=c("No","Yes")))
+b
+round(100*b,1)
+
+rclus1&lt;-as.svrepdesign(dclus1)
+a&lt;-svytotal(~interaction(stype,comp.imp), design=rclus1)
+b&lt;-ftable(a, rownames=list(stype=c("E","H","M"),comp.imp=c("No","Yes")))
+b
+round(b)
+
+a&lt;-svyby(~api99 + api00, ~stype + sch.wide, rclus1, svymean, keep.var=TRUE)
+ftable(a)
+print(ftable(a),digits=2)
+
+b&lt;-svyby(~api99 + api00, ~stype + sch.wide, rclus1, svymean, keep.var=TRUE, deff=TRUE)
+ftable(b)
+print(ftable(b),digits=2)
+
+</pre>
+
+
+
+<hr><div align="center">[Package <em>survey</em> version 3.1-1 <a href="00Index.html">Index]</a></div>
+
+</body></html>

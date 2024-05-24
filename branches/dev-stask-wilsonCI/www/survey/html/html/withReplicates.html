@@ -1,0 +1,102 @@
+<html><head><title>R: Compute variances by replicate weighting</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../R.css">
+</head><body>
+
+<table width="100%" summary="page for withReplicates {survey}"><tr><td>withReplicates {survey}</td><td align="right">R Documentation</td></tr></table>
+<h2>Compute variances by replicate weighting</h2>
+
+
+<h3>Description</h3>
+
+<p>
+Given a function or expression computing a statistic based on sampling
+weights, <code>withReplicates</code> evaluates the statistic and produces a
+replicate-based estimate of variance.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+withReplicates(design, theta, rho = NULL, ..., scale.weights=FALSE, return.replicates=FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>design</code></td>
+<td>
+A survey design with replicate weights (eg from <code><a href="svrepdesign.html">svrepdesign</a></code>)</td></tr>
+<tr valign="top"><td><code>theta</code></td>
+<td>
+A function or expression: see Details below</td></tr>
+<tr valign="top"><td><code>rho</code></td>
+<td>
+If <code>design</code> uses BRR weights, <code>rho</code> optionally
+specifies the parameter for Fay's variance estimator.</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+Other arguments to <code>theta</code></td></tr>
+<tr valign="top"><td><code>scale.weights</code></td>
+<td>
+Divide the probability weights by their sum (can
+help with overflow problems)</td></tr>
+<tr valign="top"><td><code>return.replicates</code></td>
+<td>
+Return the replicate estimates as well as
+the variance?</td></tr>
+</table>
+
+<h3>Details</h3>
+
+<p>
+If <code>theta</code> is a function its first argument will be a vector of
+weights and the second argument will be a data frame containing the
+variables from the design object. 
+</p>
+<p>
+If it is an expression, the sampling weights will be available as the
+variable <code>.weights</code>.  Variables in the design object will also
+be in scope.  It is possible to use global variables in the
+expression, but unwise, as they may be masked by local variables
+inside <code>withReplicates</code>.
+</p>
+
+
+<h3>Value</h3>
+
+<p>
+If <code>return.replicates=FALSE</code>,  the weighted statistic, with the
+variance matrix as the <code>"var"</code> attribute. If
+<code>return.replicates=TRUE</code>, a list with elements <code>theta</code> for
+the usual return value and <code>replicates</code> for the replicates.</p>
+
+<h3>See Also</h3>
+
+<p>
+<code><a href="svrepdesign.html">svrepdesign</a></code>, <code><a href="as.svrepdesign.html">as.svrepdesign</a></code>, <code><a href="svrVar.html">svrVar</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+data(scd)
+repweights&lt;-2*cbind(c(1,0,1,0,1,0), c(1,0,0,1,0,1), c(0,1,1,0,0,1),
+c(0,1,0,1,1,0))
+scdrep&lt;-svrepdesign(data=scd, type="BRR", repweights=repweights)
+
+a&lt;-svyratio(~alive, ~arrests, design=scdrep)
+print(a$ratio)
+print(a$var)
+withReplicates(scdrep, quote(sum(.weights*alive)/sum(.weights*arrests)))
+withReplicates(scdrep, function(w,data) sum(w*data$alive)/sum(w*data$arrests))
+</pre>
+
+
+
+<hr><div align="center">[Package <em>survey</em> version 3.1-1 <a href="00Index.html">Index]</a></div>
+
+</body></html>
