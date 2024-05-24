@@ -1,0 +1,88 @@
+
+R version 3.3.1 (2016-06-21) -- "Bug in Your Hair"
+Copyright (C) 2016 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(survey)
+Loading required package: grid
+Loading required package: Matrix
+Loading required package: survival
+
+Attaching package: 'survey'
+
+The following object is masked from 'package:graphics':
+
+    dotchart
+
+> library(survival)
+> data(nwtco)
+> 
+> ntwco<-subset(nwtco, !is.na(edrel))
+> 
+> load("nwtco-subcohort.rda")
+> nwtco$subcohort<-subcohort
+> 
+> d_BorganII <- twophase(id=list(~seqno,~seqno),
++                        strata=list(NULL,~interaction(instit,rel)),
++                        data=nwtco, subset=~I(rel |subcohort))
+> 
+> ##Coefficient results same as Splus with code from
+> ## http://faculty.washington.edu/norm/software.html
+> ## SE slightly larger due to using sandwich variance.
+> 
+> svycoxph(Surv(edrel, rel)~factor(stage)+factor(histol)+I(age/12), design=d_BorganII)
+Call:
+svycoxph(formula = Surv(edrel, rel) ~ factor(stage) + factor(histol) + 
+    I(age/12), design = d_BorganII)
+
+                  coef exp(coef) se(coef)     z       p
+factor(stage)2  0.4629    1.5886   0.1809  2.56  0.0105
+factor(stage)3  0.5831    1.7916   0.1785  3.27  0.0011
+factor(stage)4  1.0597    2.8854   0.2052  5.16 2.4e-07
+factor(histol)2 1.5974    4.9403   0.1334 11.97 < 2e-16
+I(age/12)       0.0299    1.0304   0.0334  0.90  0.3697
+
+Likelihood ratio test=  on 5 df, p=
+n= 1062, number of events= 571 
+> 
+> ##
+> ## This gives higher standard errors. calibrate() does not recompute the
+> ## finite population correction if a calibration variable happens to predict
+> ## sampling perfectly. It probably should.
+> ##
+> d_BorganIIps<-calibrate(twophase(id=list(~seqno,~seqno),
++                            strata=list(NULL,~rel),
++                            data=nwtco, subset=~I(rel |subcohort)), 
++                         phase=2, formula=~interaction(instit,rel),
++                         epsilon=1e-10)
+> 
+> svycoxph(Surv(edrel, rel)~factor(stage)+factor(histol)+I(age/12), design=d_BorganIIps)
+Call:
+svycoxph(formula = Surv(edrel, rel) ~ factor(stage) + factor(histol) + 
+    I(age/12), design = d_BorganIIps)
+
+                  coef exp(coef) se(coef)     z       p
+factor(stage)2  0.4629    1.5886   0.1808  2.56  0.0104
+factor(stage)3  0.5831    1.7916   0.1784  3.27  0.0011
+factor(stage)4  1.0597    2.8854   0.2051  5.17 2.4e-07
+factor(histol)2 1.5974    4.9403   0.1304 12.25 < 2e-16
+I(age/12)       0.0299    1.0304   0.0333  0.90  0.3688
+
+Likelihood ratio test=  on 5 df, p=
+n= 1062, number of events= 571 
+> 
+> proc.time()
+   user  system elapsed 
+  1.823   0.105   1.962 

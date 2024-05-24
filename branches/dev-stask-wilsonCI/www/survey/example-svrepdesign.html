@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Creating replicate weights</title>
+  </head>
+
+  <body>
+    <h1>Creating replicate weights</h1>
+
+Replicate weights present in the data file can be specified as an
+argument to <a
+href="html/svrepdesign.html">svrepdesign</a>, but it is also possible to create replicate weights from a survey design object.<p>
+
+There are three types of replicate weight that can be created with <a
+href="html/as.svrepdesign.html">as.svrepdesign</a>.
+Jackknife (JK1 and JKn) weights omit one PSU at a time. Balanced
+repeated replicates (BRR and Fay) omit or downweight half the
+sample. Bootstrap replicates resample PSUs from an estimated
+population.
+
+
+All these types of weights are created by <tt>as.svrepdesign</tt>,
+according to the <tt>type</tt> argument. The default is JK1 weights for
+an unstratified sample and JKn for a stratified sample. </p>
+
+Here we <a href="example-design.html">create a survey design object</a> using the one-stage cluster sample from the California Academic Performance Index.
+<pre>
+ data(api)
+ dclus1<-svydesign(id=~dnum, weights=~pw, data=apiclus1, fpc=~fpc)
+</pre> </p>
+
+Converting this design to use unstratified jackknife (JK1) weights is as simple as
+<pre>
+ rclus1<-as.svrepdesign(dclus1)
+</pre>
+To convert to bootstrap weights, specify the <tt>type</tt> and the number of bootstrap replicates.
+<pre>
+ bclus1 <- as.svrepdesign(dclus1,type="bootstrap", replicates=100)
+</pre> </p>
+
+
+Balanced Repeated Replicates are designed for surveys with two PSUs in
+each stratum (although <tt>as.svrepdesign</tt> will attempt to handle
+some other designs.  Within each replicate each stratum of the sample
+is split into halves, in a complex design that ensures two PSUs from
+different strata are in the same half-sample for exactly half the
+replicates.  </p>
+
+This "complete orthogonal balance" is possible only when the number of
+replicates is a multiple of 4, larger than the number of strata.  Even
+then, constructing a suitable set of replicates may be difficult. The
+survey package will sometimes use <a href="hadamard-sizes.png">more
+replicates</a> than are strictly necessary.</p>
+
+
+Here we create a design from a small data set with 2 PSUs in each stratum.
+<pre>
+ data(scd)
+ scdnofpc<-svydesign(data=scd, prob=~1, id=~ambulance, strata=~ESA,
+                     nest=TRUE)
+</pre>
+To convert to use BRR weights, we specify <tt>type="BRR"</tt>.
+<pre>
+ scd2brr <- as.svrepdesign(scdnofpc, type="BRR")
+</pre></p>
+
+
+Fay's method is a modified version of BRR that uses weights of 2-&rho; and &rho; rather than 2 and 0 for PSUs in and not in  a particular half-sample.
+<pre>
+ scd2fay <- as.svrepdesign(scdnofpc, type="Fay",fay.rho=0.3)
+</pre>
+
+
+    <hr>
+    <address><a href="mailto:tlumley@u.washington.edu">Thomas Lumley</a></address>
+<!-- Created: Tue Apr 12 12:30:23 PDT 2005 -->
+<!-- hhmts start -->
+Last modified: Tue Apr 12 12:54:05 PDT 2005
+<!-- hhmts end -->
+  </body>
+</html>
