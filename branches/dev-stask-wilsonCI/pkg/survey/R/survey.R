@@ -560,6 +560,8 @@ svymean.survey.design<-function(x,design, na.rm=FALSE,deff=FALSE, influence=FALS
     vsrs<-vsrs*(psum-nobs)/psum
     attr(average, "deff")<-v/vsrs
   }
+  # implement Bell-McCafrey here later
+  attr(average,"df")<-degf(design)
   
   return(average)
 }
@@ -608,6 +610,13 @@ SE.svystat<-function(object,...){
  v<-vcov(object)
  if (!is.matrix(v) || NCOL(v)==1) sqrt(v) else sqrt(diag(v))
 }
+
+degf.svystat<-function(object,...){
+  # implement Bell-McCafrey here later
+  attr(object,"df")
+}
+# this is declared with surveyrep.R so no need to repeat
+# degf<-function(object,...) UseMethod("degf")
 
 deff <- function(object,quietly=FALSE,...) UseMethod("deff")
 
