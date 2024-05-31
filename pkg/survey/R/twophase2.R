@@ -254,7 +254,7 @@ twophase2<-function(id,strata=NULL, probs=NULL, fpc=NULL, pps=NULL,
     rval$prob<-rep(Inf,length(rval$phase1$sample$prob))
     rval$prob[subset]<-rval$prob[subset]*d2$prob
   }
-  rval$call<-sys.call()
+  rval$call<-sys.call(-1)
   class(rval) <- c("twophase2","survey.design")
   rval
 }
