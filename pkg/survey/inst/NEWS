@@ -16,6 +16,8 @@
 
 	added svychisq.twophase2 (for Yilin Zhang)
 
+	twophase2 objects now print the call that created them better
+
 4.4-2	Invalid read in C++ code, found by Brian Ripley, fixed by Ben Schneider
 
 	Updated small-area vignette (Peter Gao)

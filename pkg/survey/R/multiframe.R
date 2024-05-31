@@ -134,13 +134,13 @@ model.frame.multiframe<-function(formula,...){
     do.call(rbind,common)              
 }
 
-update.multiframe<-function(design, ...){
-	ndesigns<-length(design$designs)
+update.multiframe<-function(object, ...){
+	ndesigns<-length(object$designs)
 	for(i in 1:ndesigns){
-		design$designs[[i]]<-update(design$designs[[i]],...)
+		object$designs[[i]]<-update(object$designs[[i]],...)
 	}
-	design$call<-sys.call(-1)
-	design
+	object$call<-sys.call(-1)
+	object
 }
 
 dimnames.multiframe<-function(x,...){
