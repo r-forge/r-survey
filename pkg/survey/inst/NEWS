@@ -18,6 +18,8 @@
 
 	twophase2 objects now print the call that created them better
 
+	?svystat and ?svrepstat now point to ?surveysummary, which describes the structure
+
 4.4-2	Invalid read in C++ code, found by Brian Ripley, fixed by Ben Schneider
 
 	Updated small-area vignette (Peter Gao)
