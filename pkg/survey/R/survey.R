@@ -1812,14 +1812,15 @@ predict.svyglm <- function(object, newdata=NULL, total=NULL,
       newdata<-model.frame(object$survey.design)
     type<-match.arg(type)
     if (type=="terms")
-      return(predterms(object,se=se.fit,...))
+        return(predterms(object,se=se.fit,...))
+    zcoef <- ifelse(is.na(object$coefficients), 0, object$coefficients)
     tt<-delete.response(terms(formula(object)))
     mf<-model.frame(tt,data=newdata, xlev=object$xlevels)
     mm<-model.matrix(tt,mf,contrasts.arg = object$contrasts)
     if (!is.null(total) && attr(tt,"intercept")){
         mm[,attr(tt,"intercept")]<-mm[,attr(tt,"intercept")]*total
     }
-    eta<-drop(mm %*% coef(object))
+    eta<-drop(mm %*% zcoef) ## allow for NA coefficients
     d<-drop(object$family$mu.eta(eta))
     eta<-switch(type, link=eta, response=object$family$linkinv(eta))
     if(se.fit){

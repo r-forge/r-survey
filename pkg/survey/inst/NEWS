@@ -1,3 +1,5 @@
+4.5	start of first version of multiphase() for arbitrary multiphase sampling
+
 4.4-3	options(survey.lonely.psu="adjust") needed strata to be a factor or numeric
 	(for Richard Li, Durga Nagori)
 
@@ -19,6 +21,10 @@
 	twophase2 objects now print the call that created them better
 
 	?svystat and ?svrepstat now point to ?surveysummary, which describes the structure
+	(for Terry Therneau)
+
+	predict.svyglm will impute zero for NA coefficients (Terry Therneau)
+
 
 4.4-2	Invalid read in C++ code, found by Brian Ripley, fixed by Ben Schneider
 
