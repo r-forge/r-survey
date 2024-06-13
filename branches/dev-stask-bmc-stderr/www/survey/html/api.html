@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Student performance in California schools</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../R.css">
+</head><body>
+
+<table width="100%" summary="page for api {survey}"><tr><td>api {survey}</td><td align="right">R Documentation</td></tr></table>
+<h2>Student performance in California schools</h2>
+
+
+<h3>Description</h3>
+
+<p>
+The Academic Performance Index is computed for all California schools
+based on standardised testing of students. The data sets contain
+information for all schools with at least 100 students and for various
+probability samples of the data.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+data(api)
+</pre>
+
+
+<h3>Format</h3>
+
+<p>
+The full population data in <code>apipop</code> are a data frame with 6194 observations on the following 37 variables.
+<dl>
+<dt>cds</dt><dd>Unique identifier</dd>
+<dt>stype</dt><dd>Elementary/Middle/High School</dd>
+<dt>name</dt><dd>School name (15 characters)</dd>
+<dt>sname</dt><dd>School name (40 characters)</dd>
+<dt>snum</dt><dd>School number</dd>
+<dt>dname</dt><dd>District name</dd>
+<dt>dnum</dt><dd>District number</dd>
+<dt>cname</dt><dd>County name</dd>
+<dt>cnum</dt><dd>County number</dd>
+<dt>flag</dt><dd>reason for missing data</dd>
+<dt>pcttest</dt><dd>percentage of students tested</dd>
+<dt>api00</dt><dd>API in 2000</dd>
+<dt>api99</dt><dd>API in 1999</dd>
+<dt>target</dt><dd>target for change in API</dd>
+<dt>growth</dt><dd>Change in API</dd>
+<dt>sch.wide</dt><dd>Met school-wide growth target?</dd>
+<dt>comp.imp</dt><dd>Met Comparable Improvement target</dd>
+<dt>both</dt><dd>Met both targets</dd>
+<dt>awards</dt><dd>Eligible for awards program</dd>
+<dt>meals</dt><dd>Percentage of students eligible for subsidized meals</dd>
+<dt>ell</dt><dd>`English Language Learners' (percent)</dd>
+<dt>yr.rnd</dt><dd>Year-round school</dd>
+<dt>mobility</dt><dd>percentage of students for whom this is the first
+year at the school</dd>
+<dt>acs.k3</dt><dd>average class size years K-3</dd>
+<dt>acs.46</dt><dd>average class size years 4-6</dd>
+<dt>acs.core</dt><dd>Number of core academic courses</dd>
+<dt>pct.resp</dt><dd>percent where parental education level is known</dd>
+<dt>not.hsg</dt><dd>percent parents not high-school graduates</dd>
+<dt>hsg</dt><dd>percent parents who are high-school graduates</dd>
+<dt>some.col</dt><dd>percent parents with some college</dd>
+<dt>col.grad</dt><dd>percent parents with college degree</dd>
+<dt>grad.sch</dt><dd>percent parents with postgraduate education</dd>
+<dt>avg.ed</dt><dd>average parental education level</dd>
+<dt>full</dt><dd>percent fully qualified teachers</dd>
+<dt>emer</dt><dd>percent teachers with emergency qualifications</dd>
+<dt>enroll</dt><dd>number of students enrolled</dd>
+<dt>api.stu</dt><dd>number of students tested.</dd>
+</dl>
+<p>
+The other data sets contain additional variables <code>pw</code> for
+sampling weights and <code>fpc</code> to compute finite population
+corrections to variance.
+</p>
+
+
+<h3>Details</h3>
+
+<p>
+<code>apipop</code> is the entire population,
+<code>apiclus1</code> is a cluster sample of school districts, <code>apistrat</code> is
+a sample stratified by <code>stype</code>, and <code>apiclus2</code> is a two-stage
+cluster sample of schools within districts.  The sampling weights in
+<code>apiclus1</code> are incorrect (the weight should be 757/15) but are as 
+obtained from UCLA.
+</p>
+
+
+<h3>Source</h3>
+
+<p>
+Data were obtained from the survey sampling help pages of UCLA
+Academic Technology Services, at <a href="http://www.ats.ucla.edu/stat/stata/Library/svy_survey.htm">http://www.ats.ucla.edu/stat/stata/Library/svy_survey.htm</a>.
+</p>
+
+
+<h3>References</h3>
+
+<p>
+The API program and original data files are at  <a href="http://api.cde.ca.gov/">http://api.cde.ca.gov/</a>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+library(survey)
+data(api)
+mean(apipop$api00)
+sum(apipop$enroll, na.rm=TRUE)
+
+#stratified sample
+dstrat&lt;-svydesign(id=~1,strata=~stype, weights=~pw, data=apistrat, fpc=~fpc)
+summary(dstrat)
+svymean(~api00, dstrat)
+svytotal(~enroll, dstrat, na.rm=TRUE)
+
+# one-stage cluster sample
+dclus1&lt;-svydesign(id=~dnum, weights=~pw, data=apiclus1, fpc=~fpc)
+summary(dclus1)
+svymean(~api00, dclus1)
+svytotal(~enroll, dclus1, na.rm=TRUE)
+
+# two-stage cluster sample
+dclus2&lt;-svydesign(id=~dnum+snum, fpc=~fpc1+fpc2, data=apiclus2)
+summary(dclus2)
+svymean(~api00, dclus2)
+svytotal(~enroll, dclus2, na.rm=TRUE)
+
+# two-stage `with replacement'
+dclus2wr&lt;-svydesign(id=~dnum+snum, weights=~pw, data=apiclus2)
+summary(dclus2wr)
+svymean(~api00, dclus2wr)
+svytotal(~enroll, dclus2wr, na.rm=TRUE)
+
+# convert to replicate weights
+rclus1&lt;-as.svrepdesign(dclus1)
+summary(rclus1)
+svymean(~api00, rclus1)
+svytotal(~enroll, rclus1, na.rm=TRUE)
+
+# post-stratify on school type
+pop.types&lt;-xtabs(~stype, data=apipop)
+
+rclus1p&lt;-postStratify(rclus1, ~stype, pop.types)
+dclus1p&lt;-postStratify(dclus1, ~stype, pop.types)
+summary(dclus1p)
+summary(rclus1p)
+
+svymean(~api00, dclus1p)
+svytotal(~enroll, dclus1p, na.rm=TRUE)
+
+svymean(~api00, rclus1p)
+svytotal(~enroll, rclus1p, na.rm=TRUE)
+
+</pre>
+
+
+
+<hr><div align="center">[Package <em>survey</em> version 3.18 <a href="00Index.html">Index</a>]</div>
+
+</body></html>

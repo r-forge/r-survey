@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Design-based t-test</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../R.css">
+</head><body>
+
+<table width="100%" summary="page for svyttest {survey}"><tr><td>svyttest {survey}</td><td align="right">R Documentation</td></tr></table>
+<h2>Design-based t-test</h2>
+
+
+<h3>Description</h3>
+
+<p>
+One-sample or two-sample t-test.  This function is a wrapper for
+<code><a href="surveysummary.html">svymean</a></code> in the one-sample case and for
+<code><a href="svyglm.html">svyglm</a></code> in the two-sample case. Degrees of freedom are
+<code>degf(design)</code> for the one-sample test and <code>degf(design)-1</code>
+for the two-sample case.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+svyttest(formula, design,  ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>formula</code></td>
+<td>
+Formula, <code>outcome~group</code> for two-sample,
+<code>outcome~0</code> or <code>outcome~1</code> for one-sample </td></tr>
+<tr valign="top"><td><code>design</code></td>
+<td>
+survey design object</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+for methods </td></tr>
+</table>
+
+<h3>Value</h3>
+
+<p>
+Object of class <code>htest</code></p>
+
+<h3>See Also</h3>
+
+<p>
+<code><a href="../../stats/html/t.test.html">t.test</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+data(api)
+dclus2&lt;-svydesign(id=~dnum+snum, fpc=~fpc1+fpc2, data=apiclus2)
+svyttest(enroll~comp.imp, dclus2)
+
+svyttest(I(api00-api99)~0, dclus2)
+
+</pre>
+
+
+
+<hr><div align="center">[Package <em>survey</em> version 3.18 <a href="00Index.html">Index</a>]</div>
+
+</body></html>

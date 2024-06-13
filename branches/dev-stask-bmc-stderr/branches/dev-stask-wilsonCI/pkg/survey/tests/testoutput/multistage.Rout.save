@@ -1,0 +1,49 @@
+
+R version 3.1.0 (2014-04-10) -- "Spring Dance"
+Copyright (C) 2014 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin13.1.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> ## 
+> ## Check that multistage samples still work
+> ##
+> library(survey)
+
+Attaching package: 'survey'
+
+The following object is masked from 'package:graphics':
+
+    dotchart
+
+> example(mu284)
+
+mu284> data(mu284)
+
+mu284> (dmu284<-svydesign(id=~id1+id2,fpc=~n1+n2, data=mu284))
+2 - level Cluster Sampling design
+With (5, 15) clusters.
+svydesign(id = ~id1 + id2, fpc = ~n1 + n2, data = mu284)
+
+mu284> (ytotal<-svytotal(~y1, dmu284))
+   total     SE
+y1 15080 2274.3
+
+mu284> vcov(ytotal)
+        y1
+y1 5172234
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  0.167   0.024   0.202 

@@ -1,0 +1,248 @@
+<html>
+<head>
+    <title>Survey analysis in R</title>
+
+<style>
+
+body { background-color: fefcf2;
+       background-image: url(gradient.png);
+       background-repeat: repeat-x; }
+H1,H2 { font-family: sans-serif}
+</style>
+</head>
+<body link="#492f0e" vlink="#600004">
+<img src="survey.jpg", align="right" alt="picture of complicated surveyor instrument">
+<p>
+    <h1>Survey analysis in R</h1>
+This is the homepage for the <a 
+href="http://cran.fhcrc.org/web/packages/survey/index.html">"survey"</a> 
+
+package, which provides facilities in <a 
+href="http://www.r-project.org">R</a> for analyzing data from complex 
+surveys. The current version is 3.29. A much  earlier version (2.2) was 
+published in <a href="http://www.jstatsoft.org/v09">Journal of Statistical 
+Software</a><p>
+
+An experimental package for very large surveys such as the American 
+Community Survey can be found <a 
+href="http://sqlsurvey.r-forge.r-project.org">here</a><p>
+
+A port of a much older version of the survey package (version 3.6-8) to 
+S-PLUS 
+8.0 is 
+available from <a 
+href="http://csan.insightful.com">CSAN</a>  (thanks to Patrick Aboyoun at 
+Insightful). 
+
+<p>
+
+Features:
+<ul>
+<li> Means, totals, ratios, quantiles, contingency tables, regression 
+models, loglinear models, survival curves,rank tests, for the whole sample 
+and for 
+domains.
+<li> Variances by Taylor linearization or by replicate weights (BRR, 
+jackknife, bootstrap, multistage bootstrap, or user-supplied)
+<li> Multistage sampling with or without replacement.
+<li> PPS sampling with or without replacement: Horvitz-Thompson and 
+Yates-Grundy estimators and 
+a range of approximations.
+<li> Post-stratification, generalized raking/calibration,  GREG 
+estimation, trimming of weights.
+<li> Two-phase designs. Estimated weights for augmented IPW estimators.
+<li> Graphics
+<li> Support for using 
+multiply imputed 
+data
+<li> Database-backed design objects for large data sets (now with replicate weights, too)
+<li> Some support for parallel processing on multicore computers.
+<li> Multivariate analysis: principal components, factor analysis (experimental).
+<li> Likelihood ratio (Rao-Scott) tests for glms, Cox models, loglinear 
+models.
+</ul>
+The <a href="NEWS">NEWS</a> file gives a history of features and bug fixes. <p>
+<strong>Comparison shopping:</strong><br>
+
+Alan Zaslavsky keeps a comprehensive <a 
+href="http://www.hcp.med.harvard.edu/statistics/survey-soft/">list of 
+survey analysis software</a> for the ASA Section on Survey Research 
+Methods.<p>
+
+User-generated ratings and reviews  of this package (and others) at <a 
+href="http://crantastic.org/packages/survey">crantastic.</a>
+
+<hr>
+
+Using the survey package:
+<ul>
+<li> <a href="example-design.html">Specifying a survey design</a> 
+<li> <a href="example-svrepdesign.html">Creating replicate weights</a>
+<li> <a href="example-summary.html">Simple summary statistics</a>
+<li> <a href="example-svrepdesign1.html">Using supplied replicate weights</a>
+<li> <a href="example-domain.html">Domain (subpopulation) estimation</a>
+
+<li> <a href="example-table.html">Tables of summary statistics</a>
+<li> <a href="example-poststrat.html">Post-stratification and calibration</a>
+<li> <a href="exmample-lonely.html">Lonely PSUs</a>
+<li> <a href="example-regression.html">Regression models</a>
+<li> <a href="example-chisq.html">Tests of association</a>
+<li> <a href="example-twostage.html">Stratification within PSUs</a>
+
+<li> <a href="example-graphics.html">Graphics</a>
+<li> <a href="svymi.html">Multiple imputation and ordinal logistic 
+regression</a>
+<li> <a href="svy-dbi.html">Database-backed survey objects</a>
+<li> <a href="example-programming.html">Programming with survey 
+objects</a>
+</ul>
+<p>
+<hr>
+<strong>
+Technical notes and comparisons with other software
+</strong><p> 
+
+Some <a href="ucla-examples.pdf">examples</a> (in PDF) translated from 
+Stata and SUDAAN examples at <a 
+href="http://www.ats.ucla.edu/stat/survey/survey_howtochoose.htm">UCLA 
+Academic Technology Services</a>.<p>
+
+Notes on the <a href="ht-sparse.pdf">sparse matrix algorithms</a> used in 
+version 3.15 for two-phase designs (and perhaps more widely in future 
+versions)</p>
+
+Notes on <a href="survcurve.pdf">standard errors for survival 
+curves</a>.</p>
+
+A 2009 <a 
+href="http://www.cdc.gov/HealthyYouth/YRBS/pdf/YRBS_analysis_software.pdf">CDC 
+report</a> compared five <strong>other</strong> survey analysis packages 
+in the context of 
+the Youth Risk Behaviors Survey. I have written an <a 
+href="YRBS-report-extension.pdf">extension</a> that does the same feature 
+comparisons and results comparisons with R and the survey package. Some of 
+this is copied from the CDC report (which I believe is in the public 
+domain), but they are (of course) not 
+responsible for any of the conclusions or results.<p>
+
+Anthony Damico has R scripts for downloading and analysing major US 
+government surveys at <a 
+href="https://github.com/ajdamico/usgsd">Github</a>.
+
+He reported on <a 
+href="http://journal.r-project.org/archive/2009-2/RJournal_2009-2_Damico.pdf">comparisons 
+of the survey package with SAS, Stata, SUDAAN</a> in <a 
+href="http://journal.r-project.org">The R Journal</a> 1(2) 37-45
+ <hr>
+<strong>Tutorials</strong><p>
+
+I have <a href="http://www.statistics.com/survey-r">a course at 
+statistics.com</a>, which will be repeated as demand permits</p>
+
+Here are <a 
+href="http://faculty.washington.edu/tlumley/survey-jsm-nup.pdf">slides</a> 
+from a Continuing Education course at JSM 2012.<p>
+
+I gave a <a 
+href="http://www.epiresearch.org/congress/wkshpdesc.php?i=0018">workshop 
+on two-phase designs</a> at the <a 
+href="http://www.epicongress2011.org">3rd North American 
+Congress of Epidemiology</a>, in Montreal, June 21,2011<p>
+
+
+I gave a two-day course for the <a 
+href="http://www.scs.gmu.edu/~wss/shortcs.html">Washington (DC) 
+Statistical 
+Society</a>, March 23-24 2010. First day on <a href="R-wss.pdf">R</a>, 
+second day on the <a href="survey-wss-2010.pdf">survey package</a>
+<p>
+
+
+Norman Breslow and I gave the course at
+<a
+href="http://www.statmed.medicina.unimib.it/statisticalps2009/statisticalps.htm">STATISTICALPS 
+2009</a>, at the 
+beginning of September in the Italian Alps. The course will include an 
+introduction to the survey package, but will focus on two-phase 
+designs in epidemiology. We will have some code and data up soon.<p>
+
+<a href="survey-census.pdf">Slides</a> from a short tutorial at the US 
+Census Bureau, August 10.<p>
+
+I gave a <a href="../tutorials/index.html">tutorial</a> at <a 
+href="http://www.agrocampus-ouest.fr/math/useR-2009/">useR 
+2009</a>, on the afternoon of 
+July 7, 2009.<p>
+
+A 1.5 hour <a href="aapoR.pdf">brief introduction to R</a>, including a 
+bit on the survey package, at the AAPOR conference, Friday May 15, 
+10:30am.</p>
+
+There was a <a href="http://staff.pubhealth.ku.dk/~pd/survey-2009">
+one-day course</a> at the University of Copenhagen Center 
+for Health and Society on April 3, 2009. Slides are available at that 
+link.<p>
+
+Tobias Verbeke has <a 
+href="http://cran.fhcrc.org/web/packages/SDaA/index.html">packaged 
+data sets and exercises</a> from Sharon Lohr's 
+<em>Sampling: Design and Analysis</em> for use with the survey package.<p>
+
+I gave a short course for the Washington Statistical Society on March 15-16 2007. The first day 
+was on R and the slides are a selection from <a 
+href="http://faculty.washington.edu/tlumley/Rcourse/">these</a>. The 
+second day was on the survey package, <a href="survey-wss.pdf">slides 
+here</a>.</p>
+
+Norman Breslow and I 
+gave a short 
+course on complex survey designs 
+for epidemiology at the 2008 WNAR (Biometric Society) meeting, <a 
+href="http://www.wnar.org">UC Davis, June 22, 2008</a>. My sessions were 
+ <a href="survey-wnar.pdf">an overview</a> of the survey package and an 
+introduction to <a href="wnar-calibrate.pdf">calibration</a>. Norm's data 
+sets and code are also <a 
+href="http://faculty.washington.edu/norm/WNAR08.html">online</a> <p>
+
+There is an  article on version 3.6-12 of the package in the <a 
+href="http://isi.cbs.nl/iass/N57.pdf">January 2008 issue</a> of <em>Survey 
+Statistician</em> (note: large PDF file)<p>
+
+<hr>
+<a 
+href="../svybook/"><img 
+src="../svybook/book-cover-small.jpg" alt="book 
+cover 
+picture" align="left" valign="bottom" height=50></a>
+I have written a book on survey analysis, based around the survey package. 
+The book is called  <em>Complex Surveys: a 
+guide to analysis 
+using R</em>.  It has just been published by  <a 
+href="http://www.wiley.com/WileyCDA/WileyTitle/productCd-0470284307,descCd-description.html">John 
+Wiley & Sons.</a>
+
+
+ It already has a <a 
+href="../svybook/">web site</a>
+ </p>
+
+<hr>
+<strong>Help pages:</strong><p>
+<ul>
+<li> <a href="doc/index.html">Vignettes</a>
+<li> PDF from <a href="http://cran.us.r-project.org/src/contrib/Descriptions/survey.html">CRAN</a>
+<li> <a 
+href="http://search.r-project.org/library/survey/html/00Index.html">HTML</a>
+</ul>
+
+The <a href="http://www.napier.ac.uk/depts/fhls/peas/">PEAS</a> project at 
+Napier 
+University has Practical Examplars for the Analysis of Surveys using R (as well as other packages). 
+
+
+<hr>
+<address><a href="mailto:tlumley@u.washington.edu">Thomas Lumley</a></address>
+
+</body>
+</html>
+

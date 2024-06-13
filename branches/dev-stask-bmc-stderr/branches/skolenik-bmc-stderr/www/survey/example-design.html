@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Specifying a survey design</title>
+  </head>
+
+  <body>
+    <h1>Specifying a survey design</h1>
+
+Survey designs are specified using the <a
+href="html/svydesign.html">svydesign</a>
+function.  The main arguments to the the function are <tt>id</tt> to
+specify sampling units (PSUs and optionally later stages),
+<tt>strata</tt> to specify strata, <tt>weights</tt> to specify sampling
+weights, and <tt>fpc</tt> to specify finite population size
+corrections.  These arguments should be given as formulas, referring to
+columns in a data frame given as the <tt>data</tt> argument.</p>
+
+The resulting survey design object contains all the data and meta-data needed for analysis, and will be supplied as an argument to analysis functions.</p>
+
+
+The survey package contains several subsamples from the California
+Academic Performance Index, in the <a href="html/api.html">api</a> data set. First, we load
+these data:
+<pre>
+  data(api)
+</pre>
+
+
+The <tt>apistrat</tt> data frame has stratified independent sample
+<pre>
+dstrat <- svydesign(id=~1,strata=~stype, weights=~pw, data=apistrat, fpc=~fpc)
+</pre>
+stratified on <tt>stype</tt>, with sampling weights <tt>pw</tt>. The
+<tt>fpc</tt> variable contains the population size for the stratum.
+
+As the schools are sampled independently, each record in the data frame
+is a separate PSU.  This is indicated by <tt>id=~1</tt>.  Since the
+sampling weights could have been determined from the population size an
+equivalent declaration would be
+<pre>
+dstrat <- svydesign(id=~1,strata=~stype,  data=apistrat, fpc=~fpc)
+</pre>
+<p>
+
+The <tt>apiclus1</tt> data frame is a cluster sample: all schools in a
+random sample of school districts.
+<pre>
+dclus1 <- svydesign(id=~dnum, weights=~pw, data=apiclus1, fpc=~fpc)
+</pre>
+There is no <tt>strata</tt> argument as the sampling was not
+stratified. The variable <tt>dnum</tt> identifies school districts
+(PSUs) and is specified as the <tt>id</tt> argument.
+ Again, the <tt>weights</tt> argument is optional, as the sampling
+ weights can be computed from the population size.
+
+To specify sampling with replacement, simply omit the <tt>fpc</tt> argument:
+<pre>
+dclus1 <- svydesign(id=~dnum, weights=~pw, data=apiclus1)
+</pre>
+<p>
+
+A design may have strata and clusters. In that case <tt>svydesign</tt>
+assumes that the clusters are numbered uniquely across the entire
+sample, rather than just within a stratum. This enables some sorts of
+data errors to be detected.  If your clusters are only numbered
+uniquely within a stratum use the option <tt>nest=TRUE</tt> to specify
+this and disable the checking.<p>
+
+
+The <tt>apiclus2</tt> data set contains a two-stage cluster sample. First, school districts were sampled. If there were fewer than five schools in the district, all were taken, otherwise a random sample of five.
+<pre>
+dclus2<-svydesign(id=~dnum+snum, fpc=~fpc1+fpc2, data=apiclus2)
+</pre>
+The multistage nature of the sampling is clear in the <tt>id</tt> and <tt>fpc</tt> arguments. At the first stage the sampling units are identified by <tt>dnum</tt> and the population size by <tt>fpc1</tt>.  At the second stage, units within each school district are identified by <tt>snum</tt> and the number of units within the district by <tt>fpc2</tt>.
+
+When a finite population correction is not given, and sampling is with replacement, only the first stage of the design is needed. The following two declarations are equivalent for treating the two-stage cluster design as if the first stage were with replacement.
+<pre>
+dclus2wr <- svydesign(id=~dnum+snum, weights=~pw, data=apiclus2)
+dclus2wr2 <- svydesign(id=~dnum, weights=~pw, data=apiclus2)
+</pre>
+
+
+
+    <hr>
+    <address><a href="mailto:tlumley@u.washington.edu">Thomas Lumley</a></address>
+<!-- Created: Tue Apr 12 10:46:01 PDT 2005 -->
+<!-- hhmts start -->
+Last modified: Thu May 19 09:08:46 PDT 2005
+<!-- hhmts end -->
+  </body>
+</html>
