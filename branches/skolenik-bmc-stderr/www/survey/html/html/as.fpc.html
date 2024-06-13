@@ -1,0 +1,71 @@
+<html><head><title>R: Package sample and population size data</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../R.css">
+</head><body>
+
+<table width="100%" summary="page for as.fpc {survey}"><tr><td>as.fpc {survey}</td><td align="right">R Documentation</td></tr></table>
+<h2>Package sample and population size data</h2>
+
+
+<h3>Description</h3>
+
+<p>
+This function creates an object to store the number of clusters sampled
+within each stratum (at each stage of multistage sampling) and the
+number of clusters available in the population.  It is called by
+<code>svydesign</code>, not directly by the user.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+as.fpc(df, strata, ids)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>df</code></td>
+<td>
+A data frame or matrix with population size information</td></tr>
+<tr valign="top"><td><code>strata</code></td>
+<td>
+A data frame giving strata at each stage</td></tr>
+<tr valign="top"><td><code>ids</code></td>
+<td>
+A data frame giving cluster ids at each stage</td></tr>
+</table>
+
+<h3>Details</h3>
+
+<p>
+The population size information may be specified as the number of
+clusters in the population or as the proportion of clusters sampled.
+</p>
+
+
+<h3>Value</h3>
+
+<p>
+An object of class <code>survey_fpc</code></p>
+
+<h3>See Also</h3>
+
+<p>
+<code><a href="svydesign.html">svydesign</a></code>,<code><a href="svyrecvar.html">svyrecvar</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+</pre>
+
+
+
+<hr><div align="center">[Package <em>survey</em> version 3.1-1 <a href="00Index.html">Index]</a></div>
+
+</body></html>

@@ -1,0 +1,163 @@
+<html>
+<title>Multiple imputation</title>
+<body>
+
+The survey package works with the mitools package to analyze multiply-imputed data. Neither package performs multiple imputation -- creating the imputations is only useful when it incorporates situation-specific knowledge.<p>
+
+This example uses the NHANES III multiple imputation data sets.  These can be downloaded from the <a href="http://www.cdc.gov/nchs/about/major/nhanes/nh3data.htm#NHANES%20III%20Series%2011,%20No.%207a,">NCHS website</a>.  For easy access I read the invariant 'core' data set and the five imputed data sets into R and saved them as six tables in a SQLite data base [<a href="http://www.sqlite.org">SQLite</a> is a small, efficient, relational database system designed for embedding in other software].
+<p>
+
+The following code establishes a connection to the database and defines a function that will load specified data variables together with the basic design variables. The function <code>impload</code> creates a SQL call to merge the relevant tables and extract the necessary variables.
+<pre>
+> library(RSQLite)
+Loading required package: DBI
+> sql<-dbDriver('SQLite')
+> conn<-dbConnect(sql,"~/nhanes/imp.db")
+> 
+> impload<-function(impno, varlist){
++ 	basicvars<-c("SEQN","WTPFQX6","SDPPSU6","SDPSTRA6")
++ 	varlist<-unique(c(basicvars, varlist))
++ 	query<-paste("select",
++ 				paste(varlist,collapse=","),
++ 		     "from core inner join",
++ 				paste("imp",impno,sep=""),
++ 		     "using(SEQN)"
++ 			)
++ 	dbGetQuery(conn,query)
++ 	}
+</pre>
+We can now use the <code>impload</code> function to load some variables, returning a list of five data frames
+<pre> 	
+> a<-lapply(1:5, impload, varlist = c("DMPPIRMI", "HAB1MI", "BMPWTMI", "HTPMI", "HSAGEU"))
+</pre>
+The <code>mitools</code> package provides <code>imputationList</code> objects to store multiple imputations and <code>MIcombine</code> to combine analyses. We load this as well as the survey package and define the design. When the <code>data=</code> argument is a <code>imputationList</code> the <code>svydesign</code> function creates a design from each data frame in the list, wrapping them in a <code>svyimputationList</code> object.
+<pre>
+> library(mitools)	
+> library(survey)
+> des<-svydesign(id=~SDPPSU6, strat=~SDPSTRA6, weight=~WTPFQX6, data=imputationList(a), nest=TRUE)
+> des
+Multiple (5) imputations: svydesign(id = ~SDPPSU6, strat = ~SDPSTRA6, weight = ~WTPFQX6, 
+    data = imputationList(a), nest = TRUE)
+</pre>
+The <code>with()</code> function evaluates an expression in each of the survey designs. The expression should not have a <code>design=</code> argument; <code>with</code> will supply this. The result is a list of the results from evaluating the expression on each imputed data set.
+<pre>
+> with(des,svymean(~factor(HAB1MI)))
+[[1]]
+                     mean     SE
+factor(HAB1MI)-9 0.252690 0.0045
+factor(HAB1MI)1  0.155718 0.0053
+factor(HAB1MI)2  0.229727 0.0055
+factor(HAB1MI)3  0.244180 0.0053
+factor(HAB1MI)4  0.094067 0.0042
+factor(HAB1MI)5  0.023618 0.0012
+
+[[2]]
+                     mean     SE
+factor(HAB1MI)-9 0.252690 0.0045
+factor(HAB1MI)1  0.155698 0.0053
+factor(HAB1MI)2  0.229850 0.0055
+factor(HAB1MI)3  0.244229 0.0053
+factor(HAB1MI)4  0.093960 0.0042
+factor(HAB1MI)5  0.023573 0.0012
+
+[[3]]
+                     mean     SE
+factor(HAB1MI)-9 0.252690 0.0045
+factor(HAB1MI)1  0.155698 0.0053
+factor(HAB1MI)2  0.229776 0.0055
+factor(HAB1MI)3  0.244247 0.0053
+factor(HAB1MI)4  0.094015 0.0042
+factor(HAB1MI)5  0.023574 0.0012
+
+[[4]]
+                     mean     SE
+factor(HAB1MI)-9 0.252690 0.0045
+factor(HAB1MI)1  0.155703 0.0053
+factor(HAB1MI)2  0.229776 0.0055
+factor(HAB1MI)3  0.244131 0.0053
+factor(HAB1MI)4  0.094081 0.0042
+factor(HAB1MI)5  0.023619 0.0012
+
+[[5]]
+                     mean     SE
+factor(HAB1MI)-9 0.252690 0.0045
+factor(HAB1MI)1  0.155771 0.0053
+factor(HAB1MI)2  0.229725 0.0055
+factor(HAB1MI)3  0.244199 0.0053
+factor(HAB1MI)4  0.094042 0.0042
+factor(HAB1MI)5  0.023573 0.0012
+
+attr(,"call")
+with(des, svymean(~factor(HAB1MI), design = .design))
+</pre>
+
+The <code>MIcombine</code> function will combine the imputations using Rubin's formulas for multiple imputation
+<pre>
+> MIcombine(with(des,svymean(~factor(HAB1MI))))
+Multiple imputation results:
+      with(des, svymean(~factor(HAB1MI), design = .design))
+      MIcombine.default(with(des, svymean(~factor(HAB1MI), design = .design)))
+                    results          se
+factor(HAB1MI)-9 0.25269038 0.004517595
+factor(HAB1MI)1  0.15571741 0.005305464
+factor(HAB1MI)2  0.22977088 0.005512850
+factor(HAB1MI)3  0.24419700 0.005295214
+factor(HAB1MI)4  0.09403291 0.004217146
+factor(HAB1MI)5  0.02359142 0.001204157
+</pre>
+Despite the imputation, 25% of the population have a self-rated health score of "-9: not applicable". We want to model the score and need to drop these people.
+Subsetting a <code>svyimputationList</code> will subset each of the designs.  This only makes sense if the subset is the same in each design.  We then fit an ordinal logistic regression model
+<pre> 
+> d2<-subset(des, HAB1MI>0 & HTPMI>0)
+> 
+> m<-with(d2,svyolr(factor(HAB1MI)~DMPPIRMI+HTPMI))
+> summary(MIcombine(m))
+Multiple imputation results:
+      with(d2, svyolr(factor(HAB1MI) ~ DMPPIRMI + HTPMI, design = .design))
+      MIcombine.default(m)
+              results          se      (lower       upper) missInfo
+DMPPIRMI -0.280006228 0.013562816 -0.30665260 -0.253359860      9 %
+HTPMI    -0.005420265 0.005167879 -0.01555286  0.004712328      4 %
+1|2      -2.491489515 0.231998740 -2.94647032 -2.036508707      5 %
+2|3      -1.010728440 0.051244821 -1.13868608 -0.882770804     88 %
+3|4       0.689929257 0.049224319  0.56774814  0.812110374     88 %
+4|5       2.472879433 0.052792399  2.35080035  2.594958519     77 %
+</pre> 
+If the subset differs between the multiple imputations the default is to take the observations that are in the subset for any imputations, with a warning.
+
+<pre>
+>  d3<-subset(des, HAB1MI>3)
+Warning message:
+In subset.svyimputationList(des, HAB1MI > 3) :
+  subset differed between imputations
+> with(d3, svymean(~I(HAB1MI>3)))
+[[1]]
+                         mean    SE
+I(HAB1MI > 3)FALSE 0.00062956 3e-04
+I(HAB1MI > 3)TRUE  0.99937044 3e-04
+
+[[2]]
+                        mean    SE
+I(HAB1MI > 3)FALSE 0.0019136 9e-04
+I(HAB1MI > 3)TRUE  0.9980864 9e-04
+
+[[3]]
+                        mean    SE
+I(HAB1MI > 3)FALSE 0.0014394 8e-04
+I(HAB1MI > 3)TRUE  0.9985606 8e-04
+
+[[4]]
+                         mean    SE
+I(HAB1MI > 3)FALSE 0.00050023 5e-04
+I(HAB1MI > 3)TRUE  0.99949977 5e-04
+
+[[5]]
+                        mean    SE
+I(HAB1MI > 3)FALSE 0.0012232 8e-04
+I(HAB1MI > 3)TRUE  0.9987768 8e-04
+
+attr(,"call")
+with(d3, svymean(~I(HAB1MI > 3), design = .design))
+</pre>
+To keep only those observations in the subset for all imputations use the <code>all=TRUE</code> argument to <code>subset</code>
+</html>
