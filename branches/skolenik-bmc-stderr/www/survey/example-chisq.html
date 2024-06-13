@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Tests in contingency tables</title>
+  </head>
+
+  <body>
+    <h1>Tests in contingency tables</h1>
+
+R implements two types of test for association in two-way tables, each with further variants.  The first type is  tests based on the Pearson chi-squared statistic, using theory developed by JNK Rao and Scott. (Annals of Statistics 12:46-60).<p>
+
+A X^2 statistic computed from an estimated  population table is too large, because the effective sample size is much smaller than the population size. Even after rescaling, its distribution is not exactly chi-squared. However, a chi-squared or F distribution for the rescaled statistic give reasonable approximations.  The default is the F distribution, the "second-order Rao-Scott adjustment".<p>
+
+Using the <tt>dclus1</tt> design object constructed in an earlier example we examine whether the proportion of schools meeting their "school-wide growth target" is different by school type. We use the default second-order adjustment and the first-order adjustment (the chi-squared approximation).
+<pre>
+ > svytable(~sch.wide + stype, dclus1)
+         stype
+ sch.wide         E         H         M
+      No   406.1640  101.5410  270.7760
+      Yes 4467.8035  372.3170  575.3989
+
+ > svychisq(~sch.wide + stype, dclus1)
+
+         Pearson's X^2: Rao & Scott adjustment
+
+ data:  svychisq(~sch.wide + stype, dclus1)
+ F = 5.1934, ndf = 1.495, ddf = 20.925, p-value = 0.02175
+
+
+ > svychisq(~sch.wide + stype, dclus1, statistic = "Chisq")
+
+         Pearson's X^2: Rao & Scott adjustment
+
+ data:  svychisq(~sch.wide + stype, dclus1, statistic = "Chisq")
+ X-squared = 11.9409, df = 2, p-value = 0.005553
+</pre>
+<p>
+
+
+The other type of test is a Wald test based on the differences between
+the observed cell counts and those expected under independence (Koch
+et al, International Statistical Review 43: 59-78).  I believe the
+<tt>statistic="Wald"</tt> test is the one used by SUDAAN. Using <tt>statistic="adjWald"</tt> reduces the statistic when the number of PSUs is small compared to the number of degrees of freedom. Rao & Thomas (JASA 82:630-636) recommend the adjusted version.
+<pre>
+ > svychisq(~sch.wide+stype, dclus1, statistic="adjWald")
+ 
+         Design-based Wald test of association
+
+ data:  svychisq(~sch.wide + stype, dclus1, statistic = "adjWald")
+ F = 2.2296, ndf = 2, ddf = 13, p-value = 0.1471
+
+ > svychisq(~sch.wide+stype, dclus1, statistic="Wald")
+
+         Design-based Wald test of association
+
+ data:  svychisq(~sch.wide + stype, dclus1, statistic = "Wald")
+ F = 2.4011, ndf = 2, ddf = 14, p-value = 0.1269
+</pre>
+
+Both types of test are also available for designs with replicate
+weights. As the number of clusters is not available with replicate
+weights the degrees of freedom are based on the rank of the matrix of
+replicate weights.
+
+    <hr>
+    <address><a href="mailto:tlumley@u.washington.edu">Thomas Lumley</a></address>
+<!-- Created: Mon Apr 18 14:35:32 PDT 2005 -->
+<!-- hhmts start -->
+Last modified: Fri Sep  2 13:54:46 PDT 2005
+<!-- hhmts end -->
+  </body>
+</html>
