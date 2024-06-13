@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Distribution of quadratic forms</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../R.css">
+</head><body>
+
+<table width="100%" summary="page for pchisqsum {survey}"><tr><td>pchisqsum {survey}</td><td align="right">R Documentation</td></tr></table>
+<h2>Distribution of quadratic forms</h2>
+
+
+<h3>Description</h3>
+
+<p>
+The distribution of a quadratic form in p standard Normal variables is
+a linear combination of p chi-squared distributions with 1df.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+pchisqsum(x, df, a, lower.tail = TRUE, method = c("satterthwaite", "integration","saddlepoint"))
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+Observed values</td></tr>
+<tr valign="top"><td><code>df</code></td>
+<td>
+Vector of degrees of freedom</td></tr>
+<tr valign="top"><td><code>a</code></td>
+<td>
+Vector of coefficients </td></tr>
+<tr valign="top"><td><code>lower.tail</code></td>
+<td>
+lower or upper  tail? </td></tr>
+<tr valign="top"><td><code>method</code></td>
+<td>
+See Details below</td></tr>
+</table>
+
+<h3>Details</h3>
+
+<p>
+The <code>"satterthwaite"</code> method uses Satterthwaite's approximation,
+and this is also used as a fallback for the other methods.
+</p>
+<p>
+<code>"integration"</code> inverts the characteristic function
+numerically. This is relatively slow, and not reliable for p-values
+below about 1e-5 in the upper tail, but is highly accurate for moderate p-values.
+</p>
+<p>
+<code>"saddlepoint"</code> uses a saddlepoint approximation when
+<code>x&gt;1.05*sum(a)</code> and the Satterthwaite approximation for
+smaller <code>x</code>. This is fast and is accurate in the upper tail, where
+accuracy is important.
+</p>
+
+
+<h3>Value</h3>
+
+<p>
+Vector of cumulative probabilities</p>
+
+<h3>References</h3>
+
+<p>
+Davies RB (1973). "Numerical inversion of a characteristic function"
+Biometrika 60:415-7
+</p>
+<p>
+Kuonen D (1999) Saddlepoint Approximations for Distributions of
+Quadratic Forms in Normal Variables. Biometrika, Vol. 86, No. 4
+(Dec., 1999), pp. 929-935
+</p>
+
+
+<h3>See Also</h3>
+
+<p>
+<code><a href="../../stats/html/Chisquare.html">pchisq</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+x &lt;- 5*rnorm(1001)^2+rnorm(1001)^2
+x.thin&lt;-sort(x)[1+(0:100)*10]
+p.invert&lt;-pchisqsum(x.thin,df=c(1,1),a=c(5,1),method="int" ,lower=FALSE)
+p.satt&lt;-pchisqsum(x.thin,df=c(1,1),a=c(5,1),method="satt",lower=FALSE)
+p.sadd&lt;-pchisqsum(x.thin,df=c(1,1),a=c(5,1),method="sad",lower=FALSE)
+
+plot(p.invert, p.satt,type="l",log="xy")
+abline(0,1,lty=2,col="purple")
+plot(p.invert, p.sadd,type="l",log="xy")
+abline(0,1,lty=2,col="purple")
+</pre>
+
+
+
+<hr><div align="center">[Package <em>survey</em> version 3.18 <a href="00Index.html">Index</a>]</div>
+
+</body></html>

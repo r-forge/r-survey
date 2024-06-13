@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Proportional odds and related models</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../R.css">
+</head><body>
+
+<table width="100%" summary="page for svyolr {survey}"><tr><td>svyolr {survey}</td><td align="right">R Documentation</td></tr></table>
+<h2>Proportional odds and related models</h2>
+
+
+<h3>Description</h3>
+
+<p>
+Fits cumulative link models: proportional odds, probit, complementary
+log-log, and cauchit.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+svyolr(formula, design, ...)
+## S3 method for class 'survey.design2':
+svyolr(formula, design, start, ..., na.action = na.omit, method = c("logistic", 
+    "probit", "cloglog", "cauchit"))
+## S3 method for class 'svyrep.design':
+svyolr(formula,design,...,return.replicates=FALSE, 
+    multicore=getOption("survey.multicore"))
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>formula</code></td>
+<td>
+Formula: the response must be a factor with at least
+three levels</td></tr>
+<tr valign="top"><td><code>design</code></td>
+<td>
+survey design object </td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+dots</td></tr>
+<tr valign="top"><td><code>start</code></td>
+<td>
+Optional starting values for optimization</td></tr>
+<tr valign="top"><td><code>na.action</code></td>
+<td>
+handling of missing values</td></tr>
+<tr valign="top"><td><code>multicore</code></td>
+<td>
+Use <code>multicore</code> package to distribute computation of replicates across multiple
+processors?</td></tr>
+<tr valign="top"><td><code>method</code></td>
+<td>
+Link function</td></tr>
+<tr valign="top"><td><code>return.replicates</code></td>
+<td>
+return the individual replicate-weight estimates</td></tr>
+</table>
+
+<h3>Value</h3>
+
+<p>
+An object of class <code>svyolr</code></p>
+
+<h3>Author(s)</h3>
+
+<p>
+The code is based closely on polr() from the MASS package of
+Venables and Ripley.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>
+<code><a href="svyglm.html">svyglm</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+data(api)
+dclus1&lt;-svydesign(id=~dnum, weights=~pw, data=apiclus1, fpc=~fpc)
+dclus1&lt;-update(dclus1, mealcat=cut(meals,c(0,25,50,75,100)))
+
+svyolr(mealcat~avg.ed+mobility+stype, design=dclus1)
+</pre>
+
+
+
+<hr><div align="center">[Package <em>survey</em> version 3.18 <a href="00Index.html">Index</a>]</div>
+
+</body></html>

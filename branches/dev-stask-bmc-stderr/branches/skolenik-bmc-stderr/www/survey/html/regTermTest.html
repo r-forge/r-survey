@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Wald test for a term in a regression model</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" type="text/css" href="../../R.css">
+</head><body>
+
+<table width="100%" summary="page for regTermTest {survey}"><tr><td>regTermTest {survey}</td><td align="right">R Documentation</td></tr></table>
+<h2>Wald test for a term in a regression model</h2>
+
+
+<h3>Description</h3>
+
+<p>
+Provides Wald test and working likelihood ratio (Rao-Scott) test of the
+hypothesis that all coefficients associated with a particular
+regression term are zero (or have some other specified
+values). Particularly useful as a substitute for <code><a href="../../stats/html/anova.html">anova</a></code>
+when not fitting by maximum likelihood.  The Wald tests use a chisquared or F distribution, the LRT uses a linear combination of chisquared distributions as in <code><a href="pchisqsum.html">pchisqsum</a></code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+regTermTest(model, test.terms, null=NULL,df=Inf, method=c("Wald","LRT"))
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>model</code></td>
+<td>
+A model object with <code><a href="../../stats/html/coef.html">coef</a></code> and <code><a href="../../stats/html/vcov.html">vcov</a></code> methods</td></tr>
+<tr valign="top"><td><code>test.terms</code></td>
+<td>
+Character string or one-sided formula giving name of
+term or terms to test</td></tr>
+<tr valign="top"><td><code>null</code></td>
+<td>
+Null hypothesis values for parameters. Default is zeros</td></tr>
+<tr valign="top"><td><code>df</code></td>
+<td>
+Denominator degrees of freedom for an F test. If
+<code>NULL</code> these are estimated from the model</td></tr>
+<tr valign="top"><td><code>method</code></td>
+<td>
+If <code>"Wald"</code>, the Wald-type test; if <code>"LRT"</code>
+the Rao-Scott test based on the estimated log likelihood ratio</td></tr>
+</table>
+
+<h3>Value</h3>
+
+<p>
+An object of class <code>regTermTest</code> or <code>regTermTestLRT</code>.</p>
+
+<h3>References</h3>
+
+<p>
+Rao, JNK, Scott, AJ (1984) "On Chi-squared Tests For Multiway Contingency Tables with Proportions Estimated From Survey Data" Annals of Statistics 12:46-60.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>
+<code><a href="../../stats/html/anova.html">anova</a></code>, <code><a href="../../stats/html/vcov.html">vcov</a></code>, <code><a href="../../stats/html/contrasts.html">contrasts</a></code>,<code><a href="pchisqsum.html">pchisqsum</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+ data(esoph)
+ model1 &lt;- glm(cbind(ncases, ncontrols) ~ agegp + tobgp * 
+     alcgp, data = esoph, family = binomial())
+ anova(model1)
+
+ regTermTest(model1,"tobgp")
+ regTermTest(model1,"tobgp:alcgp")
+ regTermTest(model1, ~alcgp+tobgp:alcgp)
+
+ data(api)
+ dclus2&lt;-svydesign(id=~dnum+snum, weights=~pw, data=apiclus2)
+ model2&lt;-svyglm(I(sch.wide=="Yes")~ell+meals+mobility, design=dclus2, family=quasibinomial())
+ regTermTest(model2, ~ell)
+ regTermTest(model2, ~ell,df=NULL)
+ regTermTest(model2, ~ell, method="LRT")
+ regTermTest(model2, ~ell+meals, method="LRT")
+</pre>
+
+
+
+<hr><div align="center">[Package <em>survey</em> version 3.18 <a href="00Index.html">Index</a>]</div>
+
+</body></html>
