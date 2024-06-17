@@ -9,10 +9,21 @@ Depends: R (>= 4.1.0), grid, methods, Matrix, survival
 Imports: stats, graphics, splines, lattice, minqa, numDeriv, mitools (>= 2.4), Rcpp (>= 0.12.8)
 LinkingTo: Rcpp, RcppArmadillo
 VignetteBuilder: R.rsp, knitr
-Suggests: foreign, MASS, KernSmooth, hexbin,
-        RSQLite, quantreg, parallel,
-        CompQuadForm, DBI, AER,
-	SUMMER (>= 1.4.0), R.rsp,
-	knitr, rmarkdown
+Suggests: 
+    foreign,
+    MASS,
+    KernSmooth,
+    hexbin,
+    RSQLite,
+    quantreg,
+    parallel,
+    CompQuadForm,
+    DBI,
+    AER,
+    SUMMER (>= 1.4.0),
+    R.rsp,
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
 URL: http://r-survey.r-forge.r-project.org/survey/
-
+Config/testthat/edition: 3

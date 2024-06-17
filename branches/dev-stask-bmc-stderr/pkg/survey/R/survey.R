@@ -1094,6 +1094,7 @@ svyglm<-function(formula, design,subset=NULL,family=stats::gaussian(),start=NULL
 svyglm.survey.design<-function(formula,design,subset=NULL, family=stats::gaussian(),start=NULL,
                                rescale=TRUE, deff=FALSE, influence=FALSE,
                                std.errors=c("linearized","Bell-McAffrey","Bell-McAffrey-2"),
+                               degf=FALSE,
                                ...){
   
     std.errors<-match.arg(std.errors)
@@ -1122,9 +1123,11 @@ svyglm.survey.design<-function(formula,design,subset=NULL, family=stats::gaussia
     else 
       g$weights<-bquote(.survey.prob.weights*.(g$weights))
     g$data<-quote(data)
-    # need the expanded design matrix for this type of standard errors
-    g$x<-(length(grep("Bell-McAffrey",std.errors))>0)
+    
+    # added for the Bell-McAffrey standard errors 
     g$std.errors<-NULL
+    g$degf<-NULL
+    
     g[[1]]<-quote(glm)      
 
     ##need to rescale weights for stability in binomial
@@ -1156,9 +1159,16 @@ svyglm.survey.design<-function(formula,design,subset=NULL, family=stats::gaussia
     # std.errors should instruct svy.varcoef to check that g$x is meaningful
     # (the same nrow as the length of the response variable) and utilize it
     # to compute the scaling factors for the residuals/estfun
-    g$cov.unscaled<-svy.varcoef(g,design,std.errors)
+    g$cov.unscaled<-svy.varcoef(g,design,std.errors,degf)
     
-    g$df.residual <- degf(design)+1-length(coef(g)[!is.na(coef(g))])
+    if (!is.null(getOption("svy.debug.bmca"))) browser()
+    
+    if (is.null(attr(g$cov.unscaled, "degf.bmca")))
+      g$df.residual <- degf(design)+1-length(coef(g)[!is.na(coef(g))])
+    else
+      g$df.residual <- min(attr(g$cov.unscaled, "degf.bmca"))
+    
+    # should g$df.null be reset to degf(design) ???
     
     class(g)<-c("svyglm",class(g))
     g$call<-match.call()
@@ -1221,7 +1231,10 @@ vcov.svyglm<-function(object,...) {
 #' Bell-McAffrey-2" for Bell-McAffrey standard errors 
 #' with exchangeable correlation working covariance matrix
 #' @returns the vector of scaled residuals
-scale_bell_mcaffrey<-function(resid,design,regressors,std.errors) {
+scale_bell_mcaffrey<-function(resid,design,regressors,std.errors, degf=FALSE) {
+  
+  if (!is.null(getOption("svy.debug.bmca"))) browser()
+  
   resid2<-as.matrix(resid)
   
   if (nrow(resid2)!=nrow(design$variables) | nrow(resid2)!=nrow(regressors))
@@ -1230,19 +1243,26 @@ scale_bell_mcaffrey<-function(resid,design,regressors,std.errors) {
   XtX<-crossprod(regressors)
   invXtX<-chol2inv(chol(XtX))
   
+  if (degf) {
+    # nrow(data) x nrow(data) matrix -- should it be sparse??
+    H <- tcrossprod(tcrossprod(regressors, invXtX), regressors)
+    H <- diag(nrow(design$variables))-H
+    G <- list()
+  }
+  
   for (k in 1:length(unique(design$cluster[,1]))) {
     # pick up the cluster ID
     clID<-unique(design$cluster)[k,1]
     # pick up the row indices
     cl_indices<-which(design$cluster[,1]==clID)
 
-    if (length(cl_indices)>ncol(regressors)) {
-      # slice the regressor matrix
-      this_X<-regressors[cl_indices,]
+    # if (length(cl_indices)>ncol(regressors)) {
+      # slice the regressor matrix; do not let R convert it to a vector!
+      this_X<-regressors[cl_indices,,drop=FALSE]
       # slice the residual matrix
       this_res<-resid2[cl_indices,]
       # form the projection
-      this_proj<-tryCatch(this_X %*% invXtX %*% t(this_X), 
+      this_proj<-tryCatch( tcrossprod( tcrossprod(this_X, invXtX), this_X), 
         error = function(e) {
           cat("Loop index = ", k, "\n")
           cat("Cluster ID = ",clID, "\n")
@@ -1253,10 +1273,74 @@ scale_bell_mcaffrey<-function(resid,design,regressors,std.errors) {
           # return zero matrix if the projection fails
           matrix(rep(0,length(cl_indices)*length(cl_indices)), nrow=length(cl_indices))
         }
+        
       )
       # update the residuals
-      resid2[cl_indices,]<-mihalf(diag(length(cl_indices))-this_proj) %*% this_res
+      A_i <- mihalf(diag(length(cl_indices))-this_proj)
+      resid2[cl_indices,]<-crossprod(A_i, this_res)
+      
+      # for the degrees of freedom calculation
+      if (degf) {
+        # Theorem 4 of Bell-McAffrey (SMJ 2002);
+        # this is the transpose of g_i
+        # the dimension is {nrow(design$variables)} x {# of regressors} 
+        # dfs are specific to parameters and have to be extracted by component
+        G[[k]] <- tcrossprod(crossprod(H[cl_indices,,drop=FALSE], A_i), tcrossprod( invXtX, this_X ))
+      }
+    # } endif dim regressors
+  }
+  
+  if (degf) {
+    if (std.errors=="Bell-McAffrey-2") {
+      # exchangeable correlation matrix, form an estimate
+      sigma2 <- sum(resid2*resid2)/length(resid2)
+      sigma_cross <- 0
+      n_cross <- 0
+      for (k in 1:length(unique(design$cluster[,1]))) {
+        # pick up the cluster ID
+        clID<-unique(design$cluster)[k,1]
+        # pick up the row indices
+        cl_indices<-which(design$cluster[,1]==clID)
+        
+        sigma_cross <- sigma_cross + sum(tcrossprod(resid2[cl_indices]))
+        n_cross <- n_cross + length(cl_indices)*length(cl_indices)
+      }
+      sigma_cross <- (sigma_cross - sum(resid2*resid2)) / (n_cross - length(resid2))
+      
+      # form monstrous V; should be a sparse matrix
+      V <- diag(sigma2,nrow=nrow(design$variables))
+      # replace off-diagonal elements within the same cluster
+      for (k in 1:length(unique(design$cluster[,1]))) {
+        # pick up the cluster ID
+        clID<-unique(design$cluster)[k,1]
+        # pick up the row indices
+        cl_indices<-which(design$cluster[,1]==clID)
+        V[cl_indices, cl_indices] <- sigma_cross
+      }
+      # the diagonal entries got overwritten
+      diag(V) <- rep(sigma2, nrow(V))
     }
+    
+    lambda <- numeric()
+    for (j in 1:ncol(regressors)) {
+      # extract the j-th component from each G[[k]] 
+      this_G <- sapply(G, function(X, col) X[,col], j)
+      # this is supposed to be nrow(design$variables) x {# clusters} matrix
+      if (std.errors=="Bell-McAffrey") {
+        # identify matrix, simple!!!
+        GVG <- tcrossprod(this_G)
+      } else if (std.errors=="Bell-McAffrey-2") {
+        # exchangeable correlation matrix
+        GVG <- crossprod(crossprod(V, this_G), this_G)
+      } else {
+        stop("Standard errors type not supported: ", std.errors)
+      }
+      eigen_GVG <- eigen(GVG, symmetric=TRUE, only.values=TRUE)
+      this_df <- { sum(eigen_GVG$values)*sum(eigen_GVG$values) / 
+        sum(eigen_GVG$values*eigen_GVG$values) }
+      lambda[j]<-this_df
+    }
+    attr(resid2,"degf") <- lambda
   }
   
   return(resid2)
@@ -1271,7 +1355,7 @@ scale_bell_mcaffrey<-function(resid,design,regressors,std.errors) {
 #' @param M a positive definite matrix
 #' @return a matrix \code{H} such that \code{H^2} equals \code{M}
 #' @author Peter Hoff
-#' @export mhalf
+#' @export 
 mhalf <-
   function(M) 
   { 
@@ -1282,18 +1366,18 @@ mhalf <-
 
 #' Symmetric inverse square root of a matrix
 #' 
-#' Computes the symmetric square root of a positive definite matrix
+#' Computes the inverse symmetric square root of a positive definite matrix
 #' 
 #' 
-#' @usage mhalf(M)
+#' @usage mihalf(M)
 #' @param M a positive definite matrix
-#' @return a matrix \code{H} such that \code{H^2} equals \code{M}
-#' @author Peter Hoff
-#' @export mhalf
+#' @return a matrix $H$ such that $H^2$ equals $M^{-1]$
+#' @author Peter Hoff, Stas Kolenikov
+#' @export 
 mihalf <-
   function(M) 
   { 
-    #symmetric square  root of a pos def matrix
+    #symmetric inverse square root of a pos def matrix
     tmp<-eigen(M)
     eigen0<-1/tmp$val
     eigen0[tmp$val==0]<-0
@@ -1302,7 +1386,8 @@ mihalf <-
 
 
 
-svy.varcoef<-function(glm.object,design,std.errors=c("linearized","Bell-McAffrey","Bell-McAffrey-2")){
+svy.varcoef<-function(glm.object,design,
+    std.errors=c("linearized","Bell-McAffrey","Bell-McAffrey-2"), degf=FALSE){
   
     std.errors<-match.arg(std.errors)
     
@@ -1312,8 +1397,9 @@ svy.varcoef<-function(glm.object,design,std.errors=c("linearized","Bell-McAffrey
     # browser()
     
     glm_resid<-naa_shorter(nas, resid(glm.object,"working"))
-    if (length(grep("Bell-McAffrey",std.errors))>0)
-      glm_resid<-scale_bell_mcaffrey(glm_resid,design,model.matrix(glm.object),std.errors)
+    if (length(grep("Bell-McAffrey",std.errors))>0) {
+      glm_resid<-scale_bell_mcaffrey(glm_resid,design,model.matrix(glm.object),std.errors,degf)
+    }
     estfun<-model.matrix(glm.object)*as.vector(glm_resid)*glm.object$weights
     
     if (glm.object$rank<NCOL(estfun)){
@@ -1333,16 +1419,22 @@ svy.varcoef<-function(glm.object,design,std.errors=c("linearized","Bell-McAffrey
     }
 
     if (inherits(design,"survey.design2"))
-      svyrecvar(estfun%*%Ainv,design$cluster,design$strata,design$fpc,postStrata=design$postStrata)
+      toreturn <- svyrecvar(estfun%*%Ainv,design$cluster,design$strata,design$fpc,postStrata=design$postStrata)
     else if (inherits(design, "twophase"))
-      twophasevar(estfun%*%Ainv, design)
+      toreturn <- twophasevar(estfun%*%Ainv, design)
     else if (inherits(design, "twophase2"))
-      twophase2var(estfun%*%Ainv, design)
+      toreturn <- twophase2var(estfun%*%Ainv, design)
     else if (inherits(design, "pps"))
-      ppsvar(estfun%*%Ainv, design)
+      toreturn <- ppsvar(estfun%*%Ainv, design)
     else
-      vcov(svytotal(estfun%*%Ainv/weights(design,"sampling"), design))
-  }
+      toreturn <- vcov(svytotal(estfun%*%Ainv/weights(design,"sampling"), design))
+    
+    if (!is.null(attr(glm_resid,"degf"))) {
+      attr(toreturn, "degf.bmca")<-attr(glm_resid,"degf")
+    }
+    
+    return(toreturn)
+}
 
 residuals.svyglm<-function(object,type = c("deviance", "pearson", "working", 
     "response", "partial"),...){
