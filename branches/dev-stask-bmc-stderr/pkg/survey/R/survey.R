@@ -1092,65 +1092,84 @@ svyglm<-function(formula, design,subset=NULL,family=stats::gaussian(),start=NULL
 }
 
 svyglm.survey.design<-function(formula,design,subset=NULL, family=stats::gaussian(),start=NULL,
-                               rescale=TRUE,..., deff=FALSE, influence=FALSE){
+                               rescale=TRUE, deff=FALSE, influence=FALSE,
+                               std.errors=c("linearized","Bell-McAffrey","Bell-McAffrey-2"),
+                               ...){
+  
+    std.errors<-match.arg(std.errors)
 
-      subset<-substitute(subset)
-      subset<-eval(subset, model.frame(design), parent.frame())
+    subset<-substitute(subset)
+    subset<-eval(subset, model.frame(design), parent.frame())
     if (!is.null(subset)){
         if (any(is.na(subset)))
             stop("subset must not contain NA values")
         design<-design[subset,]
       }
-      data<-model.frame(design)
+    data<-model.frame(design)
 
-      g<-match.call()
+    # g is a placeholder for an object of class "glm"
+    g<-match.call()
     g$formula<-eval.parent(g$formula)
     g$influence<-NULL
-      g$design<-NULL
-      g$var <- NULL
+    g$design<-NULL
+    g$var <- NULL
     g$rescale <- NULL
     g$deff<-NULL
     g$subset <- NULL  ## done it already
-      g$family<-family
-      if (is.null(g$weights))
-        g$weights<-quote(.survey.prob.weights)
-      else 
-          g$weights<-bquote(.survey.prob.weights*.(g$weights))
-      g$data<-quote(data)
-      g[[1]]<-quote(glm)      
+    g$family<-family
+    if (is.null(g$weights))
+      g$weights<-quote(.survey.prob.weights)
+    else 
+      g$weights<-bquote(.survey.prob.weights*.(g$weights))
+    g$data<-quote(data)
+    # need the expanded design matrix for this type of standard errors
+    g$x<-(length(grep("Bell-McAffrey",std.errors))>0)
+    g$std.errors<-NULL
+    g[[1]]<-quote(glm)      
 
-      ##need to rescale weights for stability in binomial
-      ## (unless the user doesn't want to)
-      if (rescale)
-          data$.survey.prob.weights<-(1/design$prob)/mean(1/design$prob)
-      else
-          data$.survey.prob.weights<-(1/design$prob)
+    ##need to rescale weights for stability in binomial
+    ## (unless the user doesn't want to)
+    if (rescale)
+        data$.survey.prob.weights<-(1/design$prob)/mean(1/design$prob)
+    else
+        data$.survey.prob.weights<-(1/design$prob)
 
-      if(any(is.na(data$.survey.prob.weights)))
-        stop("weights must not contain NA values")
-      if (!all(all.vars(formula) %in% names(data))) 
-	stop("all variables must be in design= argument")
+    if(any(is.na(data$.survey.prob.weights)))
+      stop("weights must not contain NA values")
+    if (!all(all.vars(formula) %in% names(data))) 
+    	stop("all variables must be in design= argument")
+    
     g<-with(list(data=data), eval(g))
+    # now g is a populated glm object
+    # later, design variances are computed based on the working residuals in g$residuals
+    # scaled by g$weights
     summ<-summary(g)
-      g$naive.cov<-summ$cov.unscaled
-      
-      nas<-g$na.action
-      if (length(nas))
-         design<-design[-nas,]
-
-      g$cov.unscaled<-svy.varcoef(g,design)
-      g$df.residual <- degf(design)+1-length(coef(g)[!is.na(coef(g))])
-      
-      class(g)<-c("svyglm",class(g))
-      g$call<-match.call()
-      g$call[[1]]<-as.name(.Generic)
-      if(!("formula" %in% names(g$call))) {
-        if (is.null(names(g$call)))
-          i<-1
-        else
-          i<-min(which(names(g$call)[-1]==""))
-        names(g$call)[i+1]<-"formula"
-      }
+    g$naive.cov<-summ$cov.unscaled
+    
+    nas<-g$na.action
+    if (length(nas))
+      # if there is any special na.action taken, nas would contain
+      # the indices of the rows that have missing data (SK ?? not so sure)
+       design<-design[-nas,]
+    
+    # this is where the design-based covariance is computed
+    # std.errors should instruct svy.varcoef to check that g$x is meaningful
+    # (the same nrow as the length of the response variable) and utilize it
+    # to compute the scaling factors for the residuals/estfun
+    g$cov.unscaled<-svy.varcoef(g,design,std.errors)
+    
+    g$df.residual <- degf(design)+1-length(coef(g)[!is.na(coef(g))])
+    
+    class(g)<-c("svyglm",class(g))
+    g$call<-match.call()
+    g$call[[1]]<-as.name(.Generic)
+    if(!("formula" %in% names(g$call))) {
+      if (is.null(names(g$call)))
+        i<-1
+      else
+        i<-min(which(names(g$call)[-1]==""))
+      names(g$call)[i+1]<-"formula"
+    }
 
     if(deff){
         vsrs<-summ$cov.scaled*mean(data$.survey.prob.weights)
@@ -1194,11 +1213,109 @@ vcov.svyglm<-function(object,...) {
   v
 }
 
+#' @param resid residuals (vector) or estimating functions (matrix)
+#' @param design the survey design, trimmed to missing data and subset conditions
+#' @param regressors design matrix of the glm predictors from model.matrix()
+#' @param std.errors "Bell-McAffrey" for Bell-McAffrey standard errors 
+#' with unit working covariance matrix; "
+#' Bell-McAffrey-2" for Bell-McAffrey standard errors 
+#' with exchangeable correlation working covariance matrix
+#' @returns the vector of scaled residuals
+scale_bell_mcaffrey<-function(resid,design,regressors,std.errors) {
+  resid2<-as.matrix(resid)
+  
+  if (nrow(resid2)!=nrow(design$variables) | nrow(resid2)!=nrow(regressors))
+    stop("length mismatch: this should not be happening.")
 
-svy.varcoef<-function(glm.object,design){
+  XtX<-crossprod(regressors)
+  invXtX<-chol2inv(chol(XtX))
+  
+  for (k in 1:length(unique(design$cluster[,1]))) {
+    # pick up the cluster ID
+    clID<-unique(design$cluster)[k,1]
+    # pick up the row indices
+    cl_indices<-which(design$cluster[,1]==clID)
+
+    if (length(cl_indices)>ncol(regressors)) {
+      # slice the regressor matrix
+      this_X<-regressors[cl_indices,]
+      # slice the residual matrix
+      this_res<-resid2[cl_indices,]
+      # form the projection
+      this_proj<-tryCatch(this_X %*% invXtX %*% t(this_X), 
+        error = function(e) {
+          cat("Loop index = ", k, "\n")
+          cat("Cluster ID = ",clID, "\n")
+          cat("Cluster indices = ", cl_indices, "\n")
+          cat("Regressor matrix dimensions are: \n", dim(this_X), "\n")
+          cat("(X'X)^{-1} matrix dimenstions are:\n", dim(invXtX), "\n")
+          cat("Residual vector is:\n", this_res, "\n")
+          # return zero matrix if the projection fails
+          matrix(rep(0,length(cl_indices)*length(cl_indices)), nrow=length(cl_indices))
+        }
+      )
+      # update the residuals
+      resid2[cl_indices,]<-mihalf(diag(length(cl_indices))-this_proj) %*% this_res
+    }
+  }
+  
+  return(resid2)
+}
+
+#' Symmetric square root of a matrix
+#' 
+#' Computes the symmetric square root of a positive definite matrix
+#' 
+#' 
+#' @usage mhalf(M)
+#' @param M a positive definite matrix
+#' @return a matrix \code{H} such that \code{H^2} equals \code{M}
+#' @author Peter Hoff
+#' @export mhalf
+mhalf <-
+  function(M) 
+  { 
+    #symmetric square  root of a pos def matrix
+    tmp<-eigen(M)
+    tmp$vec%*%sqrt(diag(tmp$val,nrow=nrow(M)))%*%t(tmp$vec)
+  }
+
+#' Symmetric inverse square root of a matrix
+#' 
+#' Computes the symmetric square root of a positive definite matrix
+#' 
+#' 
+#' @usage mhalf(M)
+#' @param M a positive definite matrix
+#' @return a matrix \code{H} such that \code{H^2} equals \code{M}
+#' @author Peter Hoff
+#' @export mhalf
+mihalf <-
+  function(M) 
+  { 
+    #symmetric square  root of a pos def matrix
+    tmp<-eigen(M)
+    eigen0<-1/tmp$val
+    eigen0[tmp$val==0]<-0
+    tmp$vec%*%sqrt(diag(eigen0,nrow=nrow(M)))%*%t(tmp$vec)
+  }
+
+
+
+svy.varcoef<-function(glm.object,design,std.errors=c("linearized","Bell-McAffrey","Bell-McAffrey-2")){
+  
+    std.errors<-match.arg(std.errors)
+    
     Ainv<-summary(glm.object)$cov.unscaled
     nas<-glm.object$na.action
-    estfun<-model.matrix(glm.object)*naa_shorter(nas, resid(glm.object,"working"))*glm.object$weights
+
+    # browser()
+    
+    glm_resid<-naa_shorter(nas, resid(glm.object,"working"))
+    if (length(grep("Bell-McAffrey",std.errors))>0)
+      glm_resid<-scale_bell_mcaffrey(glm_resid,design,model.matrix(glm.object),std.errors)
+    estfun<-model.matrix(glm.object)*as.vector(glm_resid)*glm.object$weights
+    
     if (glm.object$rank<NCOL(estfun)){
       estfun<-estfun[,glm.object$qr$pivot[1:glm.object$rank]]
     }
