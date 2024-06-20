@@ -80,3 +80,33 @@
       Number of Fisher Scoring iterations: 2
       
 
+# Bell-McAffrey degf work with confint.svyglm()
+
+    Code
+      confint(svyglm(api00 ~ api99 + stype, design = dclus1, std.errors = "Bell-McAffrey",
+      degf = TRUE))
+    Output
+                        2.5 %      97.5 %
+      (Intercept)  56.2792308 143.4336784
+      api99         0.8387537   0.9678245
+      stypeH      -33.1110597  -5.6634606
+      stypeM      -31.8944852  -4.4219434
+      attr(,"degf")
+      (Intercept)       api99      stypeH      stypeM 
+         6.308131    7.061340    5.304156    8.979698 
+
+---
+
+    Code
+      confint(svyglm(as.factor(sch.wide) ~ api99 + stype, design = dclus1, family = "quasibinomial",
+      std.errors = "Bell-McAffrey", degf = TRUE))
+    Output
+                        2.5 %       97.5 %
+      (Intercept) -0.50252632  6.077377146
+      api99       -0.00549704  0.004222495
+      stypeH      -3.04477253  0.830203522
+      stypeM      -3.27515434 -0.014736530
+      attr(,"degf")
+      (Intercept)       api99      stypeH      stypeM 
+         6.308131    7.061340    5.304156    8.979698 
+
