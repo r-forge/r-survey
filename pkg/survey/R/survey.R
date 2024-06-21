@@ -1825,17 +1825,27 @@ predict.svyglm <- function(object, newdata=NULL, total=NULL,
     eta<-switch(type, link=eta, response=object$family$linkinv(eta))
     if(se.fit){
         if(vcov){
-            vv<-mm %*% vcov(object) %*% t(mm)
-            attr(eta,"var")<-switch(type,
-                                    link=vv,
-                                    response=d*(t(vv*d)))
+            if (any(is.na(object$coefficients)))
+                attr(eta,"var")<- matrix(NA, nrow=NROW(mm),ncol=NROW(mm))
+            else {
+                vv<-mm %*% vcov(object) %*% t(mm)
+                attr(eta,"var")<-switch(type,
+                                        link=vv,
+                                        response=d*(t(vv*d)))
+            }
         } else {
-            ## FIXME make this more efficient
-            vv<-drop(rowSums((mm %*% vcov(object)) * mm))
-            attr(eta,"var")<-switch(type,
-                                    link=vv,
-                                    response=drop(d*(t(vv*d))))
+            if (any(is.na(object$coefficients))) {
+                attr(eta, "var")<-drop(NA+d)
+            } else {
+                ## FIXME make this more efficient
+                vv<-drop(rowSums((mm %*% vcov(object)) * mm))
+                attr(eta,"var")<-switch(type,
+                                        link=vv,
+                                        response=drop(d*(t(vv*d))))
+            }
         }
+    } else {
+        return(eta) ## no SE; no svystat
     }
     attr(eta,"statistic")<-type
     class(eta)<-"svystat"
