@@ -1848,5 +1848,5 @@ predict.svyglm <- function(object, newdata=NULL, total=NULL,
     attr(eta,"statistic")<-type
     class(eta)<-"svystat"
     eta
-    }
+}
     
