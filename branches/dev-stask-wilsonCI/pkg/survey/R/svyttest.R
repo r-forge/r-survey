@@ -145,4 +145,3 @@ print.svyciprop<-function(x,digits=max(3,getOption("digits")-4),...){
   printCoefmat(m,digits=digits, cs.ind=1:3,tst.ind=NULL)
   invisible(x)
 }
-
