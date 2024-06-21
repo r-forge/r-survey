@@ -136,8 +136,7 @@ scale_bell_mcaffrey<-function(resid,design,regressors,std.errors, degf=FALSE) {
 #' @return a matrix \code{H} such that \code{H^2} equals \code{M}
 #' @author Peter Hoff
 #' @export 
-mhalf <- function(M) 
-  { 
+mhalf <- function(M) { 
     #symmetric square  root of a pos def matrix
     tmp<-eigen(M)
     tmp$vec%*%sqrt(diag(tmp$val,nrow=nrow(M)))%*%t(tmp$vec)
@@ -153,8 +152,7 @@ mhalf <- function(M)
 #' @return a matrix $H$ such that $H^2$ equals $M^{-1]$
 #' @author Peter Hoff, Stas Kolenikov
 #' @export 
-mihalf <- function(M) 
-  { 
+mihalf <- function(M) { 
     #symmetric inverse square root of a pos def matrix
     tmp<-eigen(M)
     eigen0<-1/tmp$val
