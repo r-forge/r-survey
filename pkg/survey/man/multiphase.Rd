@@ -55,8 +55,8 @@ Sarndal, Swensson, and Wretman (1991) "Model Assisted Survey Sampling"
 }
 
 \note{
-There are currently methods for \code{svytotal} and
-\code{svymean}. Calibration is not yet implemented, nor is \code{NA} handling.
+There are currently methods for \code{svytotal},
+\code{svymean}, \code{svyglm}, \code{svyvar}. Calibration is not yet implemented, nor is \code{NA} handling.
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
@@ -68,7 +68,7 @@ There are currently methods for \code{svytotal} and
   
 }
 \examples{
-data(ntwco)
+data(nwtco)
 dcchs<-twophase(id = list(~seqno, ~seqno), strata = list(NULL, ~rel), 
     subset = ~I(in.subcohort | rel), data = nwtco)
 mcchs<-multiphase(id = list(~seqno, ~seqno), strata = list(NULL, ~rel), 
@@ -78,4 +78,7 @@ dcchs
 mcchs
 svymean(~edrel, dcchs)
 svymean(~edrel, mcchs)
+
+summary(svyglm(edrel~rel+histol+stage, design=dcchs))
+summary(svyglm(edrel~rel+histol+stage, design=mcchs))
 }

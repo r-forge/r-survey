@@ -48,7 +48,7 @@ lookup_ids<-function(ids, subsets, data){
             if (is.null(ids[[i]]))
                 stop("Must provide ids at each phase")
             else
-                ids[[i]]<-na.id(data.frame(ids[[i]]))
+                ids[[i]]<-na_id(data.frame(ids[[i]]))
         }
         
         ## make ids factor if they are character
@@ -101,7 +101,7 @@ compute_probs<-function(strata, cluster, subset){
         popsize <- mapply(function(s, i) ave(!duplicated(i), s, FUN = sum),
                           strata, cluster)
         
-        fpc <- survey:::as.fpc(popsize[subset,,drop=FALSE], strata[subset,,drop=FALSE],cluster[subset,,drop=FALSE])
+        fpc <- as.fpc(popsize[subset,,drop=FALSE], strata[subset,,drop=FALSE],cluster[subset,,drop=FALSE])
         allprob <- 1/weights(fpc, final = FALSE)
         prob <- apply(as.data.frame(allprob), 1, prod)
         list(allprob=allprob,prob=prob)     
@@ -209,23 +209,23 @@ phase_for_var<-function(data, subsets){
     for(i in 2:nphases){
         this_phase<-subsets$cumulative[[i]]
         for(j in 1:nvars){
-            if (all(is.na(data[this_phase,j])))
-                variable_phases[i]<-j
+            if (all(is.na(data[!this_phase,j])))
+                variable_phases[j]<-i
         }
     }
     variable_phases
 }
  
 
-weights.multiphase<-function(x, type=c("sampling","phase"),...){
+weights.multiphase<-function(object, type=c("sampling","phase"),...){
     type<-match.arg(type)
-    nphases<-x$nphases
+    nphases<-object$nphases
     if(type=="sampling") {
-        w<-x$finalweights*x$subpop[x$subsets$cumulative[[nphases]],nphases]
+        w<-object$finalweights*object$subpop[object$subsets$cumulative[[nphases]],nphases]
     } else if(type=="phase"){
         w<-vector("list",nphases)
         for(i in 1:nphases){
-            w[[i]]<-x$phaseweights[[i]]*x$subpop[x$subsets$cumulative[[i]],i]
+            w[[i]]<-object$phaseweights[[i]]*object$subpop[object$subsets$cumulative[[i]],i]
         }
       
     } else stop("can't happen")
@@ -247,7 +247,7 @@ update.multiphase<-function(object,...){
     
 
 
-multiphase_getdata<-function(x, design, formula_only=FALSE){
+multiphase_getdata<-function(x, design, formula_only=FALSE, phase=design$nphases){
     if (inherits(x, "formula")) {
         mf <- model.frame(x, design$data,  na.action = na.pass)
         xx <- lapply(attr(terms(x), "variables")[-1], function(tt) model.matrix(eval(bquote(~0 + 
@@ -283,6 +283,30 @@ multiphase_getdata<-function(x, design, formula_only=FALSE){
                 colnames(x) <- cn
             }
         }
+        if(NROW(x)==sum(design$subsets$cumulative[[phase]]))
+            return(as.matrix(x))
+        if(NROW(x)==sum(design$subsets$cumulative[[1]]))
+            return(as.matrix(x)[design$subsets$cumulative[[phase]],,drop=FALSE])
+        stop("explicit x must match first or last phase sample size")
     }
-    as.matrix(x)    
+    as.matrix(x)[design$subsets$cumulative[[phase]],,drop=FALSE]  
+}
+
+
+dim.multiphase<-function(x,...) dim(x$data)
+dimnames.multiphase<-function(x,...) dimnames(x$data)
+
+
+"[.multiphase"<-function (x, i, ..., drop = TRUE) 
+{
+    if (!missing(i)) {
+            if (is.logical(i)) 
+                x$subpop[!i] <- FALSE
+            else if (is.numeric(i) && length(i)) 
+                x$subpop[-i] <- FALSE
+    }    else {
+        if (!is.null(x$data)) 
+            x$data <- x$data[, ..1, drop = FALSE]
+    }
+    x
 }

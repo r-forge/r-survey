@@ -1,4 +1,5 @@
 4.5	start of first version of multiphase() for arbitrary multiphase sampling
+	(experimental, may contain nuts)
 
 4.4-3	options(survey.lonely.psu="adjust") needed strata to be a factor or numeric
 	(for Richard Li, Durga Nagori)
@@ -23,7 +24,10 @@
 	?svystat and ?svrepstat now point to ?surveysummary, which describes the structure
 	(for Terry Therneau)
 
-	predict.svyglm will impute zero for NA coefficients (Terry Therneau)
+	predict.svyglm will impute zero for NA coefficients (Terry Therneau).
+
+	With se.fit=FALSE, predict.svyglm returns a numeric vector rather than a
+	svystat object
 
 
 4.4-2	Invalid read in C++ code, found by Brian Ripley, fixed by Ben Schneider

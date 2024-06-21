@@ -96,6 +96,9 @@ the population totals and \code{total} is specified it gives the
 regression estimator of the population total.  Regression estimators of
 mean and total can also be obtained with \code{\link{calibrate}}.
 
+When the model is not of full rank, so that some coefficients are
+\code{NA}, point predictions will be made by setting those coefficients
+to zero. Standard error and variance estimates will be \code{NA}.
 
 }
 \note{
@@ -128,7 +131,8 @@ than true) population mean values.
 }
 
  \value{ \code{svyglm} returns an object of class \code{svyglm}.  The
- \code{predict} method returns an object of class \code{svystat}}
+ \code{predict} method returns an object of class \code{svystat} if
+ \code{se.fit} is \code{TRUE}, otherwise just a numeric vector}
 
 \author{Thomas Lumley}
 
