@@ -1,6 +1,8 @@
 4.5	start of first version of multiphase() for arbitrary multiphase sampling
 	(experimental, may contain nuts)
 
+	Wilson ('score test') confidence intervals in svyciprop (Stas Kolenikov)
+
 4.4-3	options(survey.lonely.psu="adjust") needed strata to be a factor or numeric
 	(for Richard Li, Durga Nagori)
 
