@@ -2039,4 +2039,10 @@ degf.twophase<-function(design,...){
   degf(design$phase2)
 }
 
+
+degf.svrepstat<-function(design,...){
+  # implement Bell-McCafrey here later
+  attr(design,"df")
+}
+
 dim.svyrep.design<-function(x) dim(x$variables)
