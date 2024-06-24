@@ -350,6 +350,8 @@ S3method(degf, svyrep.design)
 S3method(degf, pps)
 S3method(degf, twophase)
 S3method(degf, twophase2)
+S3method(degf, svystat)
+S3method(degf, svrepstat)
 
 S3method(cv,default)
 S3method(cv,svyratio)

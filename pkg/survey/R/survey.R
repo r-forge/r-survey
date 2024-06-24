@@ -560,6 +560,8 @@ svymean.survey.design<-function(x,design, na.rm=FALSE,deff=FALSE, influence=FALS
     vsrs<-vsrs*(psum-nobs)/psum
     attr(average, "deff")<-v/vsrs
   }
+  # implement Bell-McCafrey here later
+  attr(average,"df")<-degf(design)
   
   return(average)
 }
@@ -608,6 +610,14 @@ SE.svystat<-function(object,...){
  v<-vcov(object)
  if (!is.matrix(v) || NCOL(v)==1) sqrt(v) else sqrt(diag(v))
 }
+
+degf.svystat<-function(design,...){
+  # implement Bell-McCafrey here later
+  attr(design,"df")
+}
+## this is declared with surveyrep.R so no need to repeat
+## degf<-function(object,...) UseMethod("degf")
+## you still need to EXPORT it, but
 
 deff <- function(object,quietly=FALSE,...) UseMethod("deff")
 
@@ -1827,21 +1837,21 @@ predict.svyglm <- function(object, newdata=NULL, total=NULL,
         if(vcov){
             if (any(is.na(object$coefficients)))
                 attr(eta,"var")<- matrix(NA, nrow=NROW(mm),ncol=NROW(mm))
-            else {
+            else{
                 vv<-mm %*% vcov(object) %*% t(mm)
                 attr(eta,"var")<-switch(type,
                                         link=vv,
                                         response=d*(t(vv*d)))
             }
         } else {
-            if (any(is.na(object$coefficients))) {
+            if (any(is.na(object$coefficients))){
                 attr(eta, "var")<-drop(NA+d)
             } else {
-                ## FIXME make this more efficient
-                vv<-drop(rowSums((mm %*% vcov(object)) * mm))
-                attr(eta,"var")<-switch(type,
-                                        link=vv,
-                                        response=drop(d*(t(vv*d))))
+            ## FIXME make this more efficient
+            vv<-drop(rowSums((mm %*% vcov(object)) * mm))
+            attr(eta,"var")<-switch(type,
+                                    link=vv,
+                                    response=drop(d*(t(vv*d))))
             }
         }
     } else {
@@ -1850,5 +1860,5 @@ predict.svyglm <- function(object, newdata=NULL, total=NULL,
     attr(eta,"statistic")<-type
     class(eta)<-"svystat"
     eta
-    }
+}
     
