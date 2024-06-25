@@ -1,11 +1,11 @@
-#' calculations for Bell-McAffrey standard errors and degrees of freedom
+#' calculations for Bell-McCaffrey standard errors and degrees of freedom
 #' 
 #' @param resid residuals (vector) or estimating functions (matrix)
 #' @param design the survey design, trimmed to missing data and subset conditions
 #' @param regressors design matrix of the glm predictors from model.matrix()
-#' @param std.errors "Bell-McAffrey" for Bell-McAffrey standard errors 
+#' @param std.errors "Bell-McCaffrey" for Bell-McCaffrey standard errors 
 #' with unit working covariance matrix; "
-#' Bell-McAffrey-2" for Bell-McAffrey standard errors 
+#' Bell-McCaffrey-2" for Bell-McCaffrey standard errors 
 #' with exchangeable correlation working covariance matrix
 #' @param degf whether the degrees of freedom are to be computed
 #' @returns the vector of scaled residuals
@@ -61,7 +61,7 @@ scale_bell_mcaffrey<-function(resid,design,regressors,std.errors, degf=FALSE) {
     
     # for the degrees of freedom calculation
     if (degf) {
-      # Theorem 4 of Bell-McAffrey (SMJ 2002);
+      # Theorem 4 of Bell-McCaffrey (SMJ 2002);
       # this is the transpose of g_i
       # the dimension is {nrow(design$variables)} x {# of regressors} 
       # dfs are specific to parameters and have to be extracted by component
@@ -71,7 +71,7 @@ scale_bell_mcaffrey<-function(resid,design,regressors,std.errors, degf=FALSE) {
   }
   
   if (degf) {
-    if (std.errors=="Bell-McAffrey-2") {
+    if (std.errors=="Bell-McCaffrey-2") {
       # exchangeable correlation matrix, form an estimate
       sigma2 <- sum(resid2*resid2)/length(resid2)
       sigma_cross <- 0
@@ -106,10 +106,10 @@ scale_bell_mcaffrey<-function(resid,design,regressors,std.errors, degf=FALSE) {
       # extract the j-th component from each G[[k]] 
       this_G <- sapply(G, function(X, col) X[,col], j)
       # this is supposed to be nrow(design$variables) x {# clusters} matrix
-      if (std.errors=="Bell-McAffrey") {
+      if (std.errors=="Bell-McCaffrey") {
         # identify matrix, simple!!!
         GVG <- tcrossprod(this_G)
-      } else if (std.errors=="Bell-McAffrey-2") {
+      } else if (std.errors=="Bell-McCaffrey-2") {
         # exchangeable correlation matrix
         GVG <- crossprod(crossprod(V, this_G), this_G)
       } else {
