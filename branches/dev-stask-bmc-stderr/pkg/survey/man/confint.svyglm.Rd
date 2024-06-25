@@ -25,7 +25,7 @@ specified level.
     method, to use a t distribution rather than normal. If \code{NULL},
     use \code{object$df.residual}
     for Taylor-series standard errors, or \code{object$df.coef}
-    for Bell-McAffrey standard errors with adjusted degrees of freedom.}
+    for Bell-McCaffrey standard errors with adjusted degrees of freedom.}
   \item{\dots}{for future expansion}
 }
 
@@ -55,7 +55,7 @@ confint(m)
 confint(m, method="like",ddf=NULL, parm=c("ell","emer"))
 
 m2<-svyglm(I(comp.imp=="Yes")~stype*emer+ell, design=dclus2, family=quasibinomial,
-    std.errors="Bell-McAffrey-2", degf=TRUE)
+    std.errors="Bell-McCaffrey-2", degf=TRUE)
 confint(m2)
 
 }

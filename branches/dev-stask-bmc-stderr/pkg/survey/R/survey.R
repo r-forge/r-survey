@@ -1093,7 +1093,7 @@ svyglm<-function(formula, design,subset=NULL,family=stats::gaussian(),start=NULL
 
 svyglm.survey.design<-function(formula,design,subset=NULL, family=stats::gaussian(),start=NULL,
                                rescale=TRUE, deff=FALSE, influence=FALSE,
-                               std.errors=c('linearized','Bell-McAffrey','Bell-McAffrey-2'),
+                               std.errors=c('linearized','Bell-McCaffrey','Bell-McCaffrey-2'),
                                degf=FALSE,
                                ...){
   
@@ -1124,7 +1124,7 @@ svyglm.survey.design<-function(formula,design,subset=NULL, family=stats::gaussia
       g$weights<-bquote(.survey.prob.weights*.(g$weights))
     g$data<-quote(data)
     
-    # added for the Bell-McAffrey standard errors 
+    # added for the Bell-McCaffrey standard errors 
     g$std.errors<-NULL
     g$degf<-NULL
     
@@ -1229,7 +1229,7 @@ vcov.svyglm<-function(object,...) {
 
 
 svy.varcoef<-function(glm.object,design,
-    std.errors=c("linearized","Bell-McAffrey","Bell-McAffrey-2"), degf=FALSE){
+    std.errors=c("linearized","Bell-McCaffrey","Bell-McCaffrey-2"), degf=FALSE){
   
     std.errors<-match.arg(std.errors)
     
@@ -1239,7 +1239,7 @@ svy.varcoef<-function(glm.object,design,
     # browser()
     
     glm_resid<-naa_shorter(nas, resid(glm.object,"working"))
-    if (length(grep("Bell-McAffrey",std.errors))>0) {
+    if (length(grep("Bell-McCaffrey",std.errors))>0) {
       glm_resid<-scale_bell_mcaffrey(glm_resid,design,model.matrix(glm.object),std.errors,degf)
     }
     estfun<-model.matrix(glm.object)*as.vector(glm_resid)*glm.object$weights
@@ -1360,7 +1360,7 @@ summary.svyglm<-function (object, correlation = FALSE, df.resid=NULL,...)
 
 confint.svyglm<-function(object,parm,level=0.95,method=c("Wald","likelihood"),ddf=NULL,...){
     method<-match.arg(method)
-    # move parsing parm and pnames upfront as it is needed for Bell-McAffrey's d.f.s
+    # move parsing parm and pnames upfront as it is needed for Bell-McCaffrey's d.f.s
     pnames <- names(coef(object))
     if (missing(parm)) 
       parm <- seq_along(pnames)

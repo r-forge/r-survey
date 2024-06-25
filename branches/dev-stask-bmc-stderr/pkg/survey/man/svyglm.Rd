@@ -19,7 +19,7 @@ with inverse-probability weighting and design-based standard errors.
 \usage{
 \method{svyglm}{survey.design}(formula, design, subset=NULL,
     family=stats::gaussian(),start=NULL, rescale=TRUE, ..., deff=FALSE, influence=FALSE, 
-    std.errors=c("linearized","Bell-McAffrey","Bell-McAffrey-2"),degf=FALSE)
+    std.errors=c("linearized","Bell-McCaffrey","Bell-McCaffrey-2"),degf=FALSE)
 \method{svyglm}{svyrep.design}(formula, design, subset=NULL,
     family=stats::gaussian(),start=NULL, rescale=NULL, ..., rho=NULL,
     return.replicates=FALSE, na.action,multicore=getOption("survey.multicore"))
@@ -57,7 +57,7 @@ with inverse-probability weighting and design-based standard errors.
   \item{influence}{Return influence functions}
   \item{std.errors}{The kind of standard errors to compute}
   \item{degf}{Whether to compute the adjusted degrees of freedom along with 
-    Bell-McAffrey standard errors}
+    Bell-McCaffrey standard errors}
   \item{object}{A \code{svyglm} object}
   \item{correlation}{Include the correlation matrix of parameters?}
   \item{na.action}{Handling of NAs}
@@ -87,8 +87,8 @@ individual-level covariates. To get tests based on a Normal distribution
 use \code{df.resid=Inf}, and to use number of PSUs-number of strata,
 specify \code{df.resid=degf(design)}.
 
-When \code{std.errors="Bell-McAffrey(-2)"} option is specified
-for clustered \code{svydesign}, Bell-McAffrey standard errors are produced
+When \code{std.errors="Bell-McCaffrey(-2)"} option is specified
+for clustered \code{svydesign}, Bell-McCaffrey standard errors are produced
 that adjust for some of the known downward biases of linearized 
 standard errors. Bell and McAffrey (2002) also suggest corrections
 for the degrees of freedom, which end up being even more conservative
@@ -97,8 +97,8 @@ By default, the computation of these degrees of freedom adjustments
 is skipped (\code{degf=FALSE}) as they require dealing with 
 projection matrices of size \code{nrow(svydesign$variables)} by 
 \code{nrow(svydesign$variables)}. The option 
-\code{std.errors="Bell-McAffrey"} produces a version with unit working
-residual covariance matrix, and option \code{std.errors="Bell-McAffrey-2"}
+\code{std.errors="Bell-McCaffrey"} produces a version with unit working
+residual covariance matrix, and option \code{std.errors="Bell-McCaffrey-2"}
 produces a version with the exchangeable correlation working
 residual covariance matrix, recommended by Imbens and Kolesar (2016)
 (typically more conservative). The standard errors themselves
@@ -204,8 +204,8 @@ Statistical Science 32: 265-278.
   summary(svyglm(api00~ell+meals+mobility, design=rclus2))
 
   ## standard errors corrected up
-  summary(svyglm(api00~ell+meals+mobility, design=dstrat, std.errors="Bell-McAffrey"))
-  summary(svyglm(api00~ell+meals+mobility, design=dclus2, std.errors="Bell-McAffrey"))
+  summary(svyglm(api00~ell+meals+mobility, design=dstrat, std.errors="Bell-McCaffrey"))
+  summary(svyglm(api00~ell+meals+mobility, design=dclus2, std.errors="Bell-McCaffrey"))
   ## not applicable to replicate designs
 
   ## use quasibinomial, quasipoisson to avoid warning messages
