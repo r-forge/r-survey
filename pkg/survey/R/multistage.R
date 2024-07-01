@@ -492,7 +492,18 @@ as.fpc<-function(df,strata,ids,pps=FALSE){
     cat("record",small[1,1]," stage ",small[1,2],": fpc=", fpc[small[1,,drop=FALSE]],"\n")      
     stop("Must have all fpc>=1 or all fpc<=1")
   }
-  
+
+  if (NCOL(sampsize)<NCOL(fpc)) stop("need at least as many id as fpc stages")
+    if (NCOL(sampsize)>NCOL(fpc)) {
+        tmp<-fpc   
+        if (ispopsize)
+            fpc<-matrix(Inf, nrow=NROW(sampsize), ncol=NCOL(sampsize))
+        else
+            fpc<-matrix(0, nrow=NROW(sampsize), ncol=NCOL(sampsize))
+        fpc[,1:NCOL(tmp)]<-tmp
+        warning("stages without fpc were treated as with replacement")
+    }
+    
   if (ispopsize){
     if(pps) stop("fpc must be specified as sampling fraction for PPS sampling")
     popsize<-fpc

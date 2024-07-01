@@ -10,7 +10,8 @@ sampling, allowing estimation and (in the future) calibration/raking at
 each phase
 }
 \usage{
-multiphase(ids, subset, strata, probs, data, fpc = NULL)
+multiphase(ids, subset, strata, probs, data, fpc = NULL,
+check.variable.phase=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -38,6 +39,9 @@ data frame of data}
   \item{fpc}{
 Finite population correction for the first phase, if needed
   }
+\item{check.variable.phase}{Work out which phase each variable is
+  observed in by looking at missing value patterns. You may want
+  \code{FALSE} for simulations where the values aren't actually missing}
 }
 \details{
   Variance calculation uses a decomposition with sampling contributions
@@ -81,4 +85,7 @@ svymean(~edrel, mcchs)
 
 summary(svyglm(edrel~rel+histol+stage, design=dcchs))
 summary(svyglm(edrel~rel+histol+stage, design=mcchs))
+
+m<-calibrate(mcchs,~factor(stage)+rel, phase=2, calfun="raking")
+vcov(svytotal(~factor(stage), m))
 }
