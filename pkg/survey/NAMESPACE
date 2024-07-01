@@ -578,5 +578,6 @@ S3method(degf, multiphase)
 S3method(svyvar, multiphase)
 S3method(dim, multiphase)
 S3method(dimnames, multiphase)
+S3method(calibrate, multiphase)
 
 S3method(withCrossval, svyrep.design)
