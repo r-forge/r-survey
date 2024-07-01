@@ -3,6 +3,9 @@
 
 	Wilson ('score test') confidence intervals in svyciprop (Stas Kolenikov)
 
+	svydesign() gives a clearer error message when there are more stages in
+	fpc= than in id= (for Stephanie Zimmer)
+
 4.4-3	options(survey.lonely.psu="adjust") needed strata to be a factor or numeric
 	(for Richard Li, Durga Nagori)
 

@@ -30,3 +30,10 @@ stopifnot(all.equal(as.vector(SE(old)), as.vector(SE(new))))
 stopifnot(all.equal( attr(vcov(old),"phases")[[1]], attr(vcov(new),"phases")[[1]]))
 stopifnot(all.equal( attr(vcov(old),"phases")[[2]], attr(vcov(new),"phases")[[2]]))
 
+## not identical yet, need to update
+m<-calibrate(mcchs,~factor(stage)+rel, phase=2, calfun="raking")
+d<-calibrate(dcchs,~factor(stage)+rel, phase=2, calfun="raking")
+old<-vcov(svytotal(~factor(stage), m))
+new<-vcov(svytotal(~factor(stage), d))
+stopifnot(all(abs(attr(old,"phases")[[2]])<1e-10))
+stopifnot(all(abs(attr(new,"phases")[[2]])<1e-10))
