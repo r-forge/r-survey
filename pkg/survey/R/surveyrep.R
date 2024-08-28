@@ -548,11 +548,12 @@ svrepdesign.default<-function(variables=NULL,repweights=NULL, weights=NULL,
     }
   }
 
-  if (type =="JKn" && is.null(rscales))
-    if (!combined.weights) {
-      warning("rscales (n-1)/n not provided:guessing from weights")
-      rscales<-1/apply(repweights,2,max)
-    } else stop("Must provide rscales for combined JKn weights")
+  if (type =="JKn" && is.null(rscales)){
+      if (!combined.weights) {
+          warning("rscales (n-1)/n not provided:guessing from weights")
+          rscales<-1/apply(repweights,2,max)
+      } else stop("Must provide rscales for combined JKn weights")
+  }
 
     if (type %in% c("ACS","successive-difference")){
         rscales<-rep(1, ncol(repweights))
@@ -598,6 +599,14 @@ svrepdesign.default<-function(variables=NULL,repweights=NULL, weights=NULL,
         rval$degf<-degf
     else
         rval$degf<-degf(rval)
+    if (type=="ACS"){
+        if (missing(mse) && !mse){
+            mse<-TRUE
+            message("mse=TRUE assumed for type=\"ACS\"")
+        } else if (!mse){
+            warning("The ACS uses MSE standard errors but you have specified mse=FALSE")
+        }
+    }
   rval$mse<-mse
   rval
   
@@ -620,7 +629,15 @@ print.svyrep.design<-function(x,...){
   if (x$type=="mrbbootstrap")
     cat("Multistage rescaled bootstrap ")
   if (x$type=="subbootstrap")
-    cat("(n-1) bootstrap ")
+      cat("(n-1) bootstrap ")
+  if (x$type=="successive-difference")
+      cat("Successive difference ")
+  if (x$type=="ACS")
+      cat("American Community Survey ")
+  if(x$type=="JK2")
+      cat("JK2 jackknife ")
+  if(x$type=="other")
+      cat("Replicate weight design ")
   nweights<-ncol(x$repweights)
   cat("with", nweights,"replicates")
   if (!is.null(x$mse) && x$mse) cat(" and MSE variances")

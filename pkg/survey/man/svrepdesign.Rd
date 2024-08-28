@@ -82,7 +82,12 @@ below}
  automatically use \code{scale = 4/ncol(repweights)} and \code{rscales=rep(1,
    ncol(repweights))}. This can be specified as \code{type="ACS"} or
  \code{type="successive-difference"}. The \code{scale} and \code{rscales}
- arguments will be ignored (with a warning) if they are specified.
+ arguments will be ignored (with a warning) if they are specified. The
+ American Community Survey recommends mse-style standard error
+ estimates; if you do not specify \code{mse} explicitly \code{mse=TRUE}
+ will be set with a message, overriding
+ \code{getOption("survey.replicates.mse")}. If you explicitly specify
+ \code{mse=FALSE} there will be a warning but your choice will be respected. 
 
  JK2 weights (\code{type="JK2"}), as in the California Health Interview
  Survey, automatically use \code{scale=1},  \code{rscales=rep(1, ncol(repweights))}.
