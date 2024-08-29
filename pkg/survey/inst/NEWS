@@ -6,6 +6,14 @@
 	svydesign() gives a clearer error message when there are more stages in
 	fpc= than in id= (for Stephanie Zimmer)
 
+	svrepdesign(type="ACS") now uses mse=TRUE unless mse=FALSE is explicitly
+	given, in which case it warns (for Anthony Damico)
+
+	svystat,svrepstat objects lose their variance attribute and class on
+	transformation so the standard errors don't end up misleading
+	(for Pavel Krivitsky)
+	
+
 4.4-3	options(survey.lonely.psu="adjust") needed strata to be a factor or numeric
 	(for Richard Li, Durga Nagori)
 

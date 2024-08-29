@@ -234,6 +234,9 @@ S3method(svycontrast, svrepcoxph)
 S3method(svycontrast,default)
 S3method(svycontrast, svyvar)
 
+S3method(Ops, svystat)
+S3method(Math, svystat)
+
 S3method(image,svyrep.design)
 S3method(image,pps)
 S3method(plot,svysmooth)

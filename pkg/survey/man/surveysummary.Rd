@@ -153,6 +153,9 @@ survey functions.
 
     When \code{return.replicates=TRUE}, the \code{svrepstat} object is a
     list whose second component is a matrix of replicate values.
+
+    \code{svystat} objects have \code{Math} and \code{Ops} methods that
+    remove the variance attribute
     
 }
 

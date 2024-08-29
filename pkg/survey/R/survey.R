@@ -701,7 +701,7 @@ svyvar.survey.design<-function(x, design, na.rm=FALSE,...){
             x<-eval(x, design$variables)
         
 	n<-sum((weights(design,"sampling")!=0) & (rowSums(is.na(as.matrix(x)))==0))
-	xbar<-svymean(x,design, na.rm=na.rm)
+	xbar<-coef(svymean(x,design, na.rm=na.rm))
     if(NCOL(x)==1) {
         if(n==1){
             v<-NA
