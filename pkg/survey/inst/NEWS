@@ -10,7 +10,8 @@
 	given, in which case it warns (for Anthony Damico)
 
 	svystat,svrepstat objects lose their variance attribute and class on
-	transformation so the standard errors don't end up misleading
+	math operations so the standard errors don't end up misleading. Use
+	svycontrast() to get transformed versions with SEs
 	(for Pavel Krivitsky)
 	
 

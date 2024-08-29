@@ -6,7 +6,7 @@ Multiphase sampling designs
 }
 \description{
 These objects represent designs with arbitrarily many nested phases of
-sampling, allowing estimation and (in the future) calibration/raking at
+sampling, allowing estimation and calibration/raking at
 each phase
 }
 \usage{
@@ -60,7 +60,7 @@ Sarndal, Swensson, and Wretman (1991) "Model Assisted Survey Sampling"
 
 \note{
 There are currently methods for \code{svytotal},
-\code{svymean}, \code{svyglm}, \code{svyvar}. Calibration is not yet implemented, nor is \code{NA} handling.
+\code{svymean}, \code{svyglm}, \code{svyvar}.
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
