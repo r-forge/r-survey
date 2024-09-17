@@ -1179,7 +1179,7 @@ svyglm.survey.design<-function(formula,design,subset=NULL, family=stats::gaussia
             }
         attr(g, "influence")<-estfun%*%g$naive.cov
     }
-
+    g$aic<-NA
     g$survey.design<-design 
     g
 }

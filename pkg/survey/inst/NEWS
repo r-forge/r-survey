@@ -13,6 +13,10 @@
 	math operations so the standard errors don't end up misleading. Use
 	svycontrast() to get transformed versions with SEs
 	(for Pavel Krivitsky)
+
+	The $aic component of svyglm objects, which is undocumented and meaningless,
+	is now set to NA. If this breaks your code, your code was already wrong.
+	(for Michael Reiss)
 	
 
 4.4-3	options(survey.lonely.psu="adjust") needed strata to be a factor or numeric
