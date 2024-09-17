@@ -1309,6 +1309,7 @@ svrepglm<-svyglm.svyrep.design<-function(formula, design, subset=NULL,family=sta
       i<-min(which(names(full$call)[-1]==""))
     names(full$call)[i+1]<-"formula"
   }
+  full$aic<-NA  
   full$survey.design<-design
   full
 }
