@@ -28,7 +28,8 @@ List of as many model formulas as phases describing strata for each phase. Each 
 indicate multistage sampling, or \code{NULL} for no strata
   }
   \item{probs}{
-List of as many model formulas or \code{pps_spec} objects as phases describing sampling probabilities for each phase. Each formula may
+List of as many model formulas or \code{pps_spec} objects as phases
+describing sampling probabilities for each phase. Each formula may
 indicate multistage sampling. Typically will either be \code{NULL} except for
 phase 1 if \code{strata} are specified, or a matrix of class
 \code{pps_spec} specifying pairwise probabilities or covariances. Use
