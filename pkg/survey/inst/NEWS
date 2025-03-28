@@ -17,6 +17,9 @@
 	The $aic component of svyglm objects, which is undocumented and meaningless,
 	is now set to NA. If this breaks your code, your code was already wrong.
 	(for Michael Reiss)
+
+	svyby(covmat=TRUE) now works for estimators where subset() doesn't actually
+	drop rows
 	
 
 4.4-3	options(survey.lonely.psu="adjust") needed strata to be a factor or numeric
