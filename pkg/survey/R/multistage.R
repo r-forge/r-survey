@@ -104,7 +104,6 @@ svydesign.default<-function(ids,probs=NULL,strata=NULL,variables=NULL, fpc=NULL,
        else
          probs<-as.data.frame(1/as.matrix(weights))
      }
-
       
 
     na.strata<-na.failsafe("missing values in `strata'")
@@ -207,13 +206,15 @@ svydesign.default<-function(ids,probs=NULL,strata=NULL,variables=NULL, fpc=NULL,
     }
 
   
-    if (is.numeric(probs) && length(probs)==1)
-      probs<-rep(probs, NROW(variables))
+    if (NROW(probs)==1 && NCOL(probs)==1 && is.numeric(probs[[1]]))
+      probs<-rep(probs[[1]], NROW(variables))
     
     if (length(probs)==0) probs<-rep(1,NROW(variables))
     
     if (NCOL(probs)==1) probs<-data.frame(probs)
 
+    if (NROW(probs)!=NROW(ids)) stop("lengths of prob/weights and ids don't match")
+    
     rval<-list(cluster=ids)
     rval$strata<-strata
     rval$has.strata<-has.strata

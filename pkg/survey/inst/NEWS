@@ -20,6 +20,9 @@
 
 	svyby(covmat=TRUE) now works for estimators where subset() doesn't actually
 	drop rows
+
+	svydesign(.., weights=1) now works, though it's still not recommended. Attempts
+	to recycle a weights vector that isn't of length 1 get an error
 	
 
 4.4-3	options(survey.lonely.psu="adjust") needed strata to be a factor or numeric
