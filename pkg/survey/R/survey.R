@@ -1185,8 +1185,8 @@ svyglm.survey.design<-function(formula,design,subset=NULL, family=stats::gaussia
 }
 
 print.svyglm<-function(x,...){
-  print(x$survey.design, varnames=FALSE, design.summaries=FALSE,...)
-  NextMethod()
+    print(x$survey.design, varnames=FALSE, design.summaries=FALSE,...)
+    NextMethod()
 
 }
 
