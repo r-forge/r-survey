@@ -499,7 +499,8 @@ svrepdesign.default<-function(variables=NULL,repweights=NULL, weights=NULL,
         if (!is.numeric(degf)) stop("degf must be NULL or numeric")
         if (degf>ncol(repweights)) warning(paste0("degf (", degf,") is larger than number of replicates (",ncol(repweights),")"))
         if (degf<=1) warning("degf is <=1")
-        }
+        attr(degf,"set-by-user")<-TRUE
+    } 
 
   repwtmn<-mean(apply(repweights,2,mean))
   wtmn<-mean(weights)
@@ -682,8 +683,9 @@ image.svyrep.design<-function(x, ..., col=grey(seq(.5,1,length=30)),
     if (!missing(j))
       x$variables<-x$variables[i,j, drop=FALSE]
     else
-      x$variables<-x$variables[i,,drop=FALSE]
-    x$degf<-NULL
+        x$variables<-x$variables[i,,drop=FALSE]
+    if (is.null(attr(x$degf,"set-by-user"))) ##keep it if user-specified
+        x$degf<-NULL
     x$degf<-degf(x)
   } else {
     x$variables<-x$variables[,j,drop=FALSE]

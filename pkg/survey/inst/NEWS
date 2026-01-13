@@ -23,6 +23,10 @@
 
 	svydesign(.., weights=1) now works, though it's still not recommended. Attempts
 	to recycle a weights vector that isn't of length 1 get an error
+
+	for replicate-weight designs with user-forced degrees of freedom, the
+	degrees of freedom shouldn't change under subsetting
+	(because that's computationally expensive).  For Joel Barnes, Isabelle Michaud
 	
 
 4.4-3	options(survey.lonely.psu="adjust") needed strata to be a factor or numeric
