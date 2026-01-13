@@ -1,5 +1,17 @@
 library(survey)
 
+
+# Load dataset
+data(scd)
+
+# Create rep weights
+repweights <- 2 * cbind(
+  c(1,0,1,0,1,0), 
+  c(1,0,0,1,0,1), 
+  c(0,1,1,0,0,1),
+  c(0,1,0,1,1,0)
+)
+
 scdrep <- svrepdesign(
   data = scd, 
   type = "BRR", 
@@ -13,7 +25,7 @@ df1<-scdrep$degf
 
 scdsub<-subset(
   x = scdrep,
-  arrests >= 100
+  arrests >= 200
 )
 
 

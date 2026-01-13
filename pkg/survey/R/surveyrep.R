@@ -687,6 +687,7 @@ image.svyrep.design<-function(x, ..., col=grey(seq(.5,1,length=30)),
     if (is.null(attr(x$degf,"set-by-user"))) ##keep it if user-specified
         x$degf<-NULL
     x$degf<-degf(x)
+    if (x$degf>length(x$pweights)) warning("Fewer observations than degrees of freedom in subset")
   } else {
     x$variables<-x$variables[,j,drop=FALSE]
   }
