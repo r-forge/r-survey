@@ -1268,7 +1268,8 @@ svrepglm<-svyglm.svyrep.design<-function(formula, design, subset=NULL,family=sta
           contrl<-full$control
           if (multicore){
             betas<-do.call(rbind,parallel::mclapply(1:ncol(wts), function(i){
-              wi<-as.vector(wts[,i])*pw1
+                wi<-as.vector(wts[,i])*pw1
+                if(all(wi==0)) return(NaN*beta0)
               glm.fit(XX, YY, weights = wi/sum(wi),
                       start =beta0,
                       offset = offs,
@@ -1279,6 +1280,7 @@ svrepglm<-svyglm.svyrep.design<-function(formula, design, subset=NULL,family=sta
           } else {
             for(i in 1:ncol(wts)){
               wi<-as.vector(wts[,i])*pw1
+              if(all(wi==0)) return(NaN*beta0)
               betas[i,]<-glm.fit(XX, YY, weights = wi/sum(wi),
                                  start =beta0,
                                  offset = offs,

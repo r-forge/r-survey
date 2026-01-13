@@ -53,8 +53,8 @@ The \code{"mean"} method is a Wald-type interval on the probability
 scale, the same as \code{confint(svymean())}
 
 All methods undercover for probabilities close enough to zero or one,
-but \code{"beta"}, \code{"likelihood"}, \code{"logit"}, and \code{"logit"} are noticeably
-better than the other two. None of the methods will work when the
+but \code{"mean"} and \code{"asin"} are noticeably
+worse than the others. None of the methods will work when the
 observed proportion is exactly 0 or 1.
 
 The \code{confint} method extracts the confidence interval; the
