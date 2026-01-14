@@ -73,8 +73,7 @@ error of the mean.
 \references{
 Rao, JNK, Scott, AJ (1984) "On Chi-squared Tests For Multiway
 Contingency Tables with Proportions Estimated From Survey Data" Annals
-of Statistics 12:46-60. 
-\url{https://doi.org/10.1214/AOS/1176346391}
+of Statistics 12:46-60.
 
   Korn EL, Graubard BI. (1998) Confidence Intervals For Proportions With
   Small Expected Number of Positive Counts Estimated From Survey
@@ -84,7 +83,6 @@ of Statistics 12:46-60.
 Dean, N., and Pagano, M. (2015) Evaluating Confidence Interval Methods 
 for Binomial Proportions in Clustered Surveys.
 Journal of Survey Statistics and Methodology, 3 (4), 484-503.
-\url{https://doi.org/10.1093/jssam/smv024}
 
 }
 
