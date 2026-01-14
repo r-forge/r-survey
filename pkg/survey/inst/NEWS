@@ -27,6 +27,9 @@
 	for replicate-weight designs with user-forced degrees of freedom, the
 	degrees of freedom shouldn't change under subsetting
 	(because that's computationally expensive).  For Joel Barnes, Isabelle Michaud
+
+	clarify that calibrate() can take margins specified in either of the formats
+	that rake() accepts
 	
 
 4.4-3	options(survey.lonely.psu="adjust") needed strata to be a factor or numeric
