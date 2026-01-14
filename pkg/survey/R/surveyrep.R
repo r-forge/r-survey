@@ -1985,11 +1985,10 @@ rake<-function(design, sample.margins, population.margins,
                    )
     
 
-    allterms<-unlist(lapply(sample.margins,all.vars))
-    ff<-formula(paste("~", paste(allterms,collapse="+"),sep=""))
-    oldtable<-svytable(ff, design)
+    oldtables<-lapply(sample.margins, function(margin) svytable(margin, design))
+    names(oldtables) <- lapply(sample.margins, all.vars)
     if (control$verbose)
-        print(oldtable)
+        print(oldtables)
 
     oldpoststrata<-design$postStrata
     iter<-0
@@ -2003,16 +2002,19 @@ rake<-function(design, sample.margins, population.margins,
                                  population.margins[[i]],
                                  compress=FALSE)
         }
-        newtable<-svytable(ff, design)
+        newtables<-lapply(sample.margins, function(margin) svytable(margin, design))
+        names(newtables) <- lapply(sample.margins, all.vars)
         if (control$verbose)
-            print(newtable)
+            print(newtables)
 
-        delta<-max(abs(oldtable-newtable))
+        delta<-sapply(seq_along(sample.margins), function(margin_index) {
+          max(abs(newtables[[margin_index]] - oldtables[[margin_index]]))
+        }) |> max()
         if (delta<epsilon){
             converged<-TRUE
             break
         }
-        oldtable<-newtable
+        oldtables<-newtables
         iter<-iter+1
     }
 
