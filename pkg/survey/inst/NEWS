@@ -32,6 +32,9 @@
 	that rake() accepts
 
 	rake() now handles much larger sets of margins (from Ben Schneider)
+
+	confint(withReplicates()) assigns names when there aren't any,
+	rather than failing (from Ben Schneider)
 	
 
 4.4-3	options(survey.lonely.psu="adjust") needed strata to be a factor or numeric
