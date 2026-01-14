@@ -38,6 +38,8 @@
 
 	degf<-.svyrep.design() to allow the user to modify the degrees of freedom
 	if they specified it by hand
+
+	a bit more detail on svyciprop(type="xlogit") (from Ben Schneider)
 	
 
 4.4-3	options(survey.lonely.psu="adjust") needed strata to be a factor or numeric

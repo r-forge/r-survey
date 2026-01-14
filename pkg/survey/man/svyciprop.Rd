@@ -42,7 +42,12 @@ estimated variance of the proportion. (Korn and Graubard, 1998)
 
 The \code{"xlogit"} method uses a logit transformation of the mean and
 then back-transforms to the probablity scale. This appears to be the
-method used by SUDAAN and SPSS COMPLEX SAMPLES. 
+method used by SUDAAN and SPSS COMPLEX SAMPLES and the Stata option
+\code{citype(logit)}. The results are nearly identical to the \code{"logit"} method 
+except when replicate weights are used, as in that case \code{"logit"} 
+estimates the variance of the transformed proportion using the replicate weights, 
+whereas \code{"xlogit"} uses the replicate weights to estimate 
+the variance of the proportion.
 
 The \code{"wilson"} method is the Wilson score interval, which inverts
 the coverage probability statement using the true probability rather
