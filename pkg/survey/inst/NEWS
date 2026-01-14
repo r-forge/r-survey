@@ -35,6 +35,9 @@
 
 	confint(withReplicates()) assigns names when there aren't any,
 	rather than failing (from Ben Schneider)
+
+	degf<-.svyrep.design() to allow the user to modify the degrees of freedom
+	if they specified it by hand
 	
 
 4.4-3	options(survey.lonely.psu="adjust") needed strata to be a factor or numeric

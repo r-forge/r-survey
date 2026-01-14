@@ -2070,4 +2070,21 @@ degf.svrepstat<-function(design,...){
   attr(design,"df")
 }
 
+"degf<-"<-function(design, value){
+    UseMethod("degf<-")
+}
+
+"degf<-.default"<-function(design, value){
+    stop("cannot assign degf for this class of design")
+}
+
+"degf<-.svyrep.design"<-function(design, value){
+    attr(value,"set-by-user")<-TRUE
+    if (value>sum(weights(design,"sampling")>0))
+        warning("assigned degf larger than number of observations")
+    design$degf<-value
+    design
+}
+
+
 dim.svyrep.design<-function(x) dim(x$variables)
