@@ -40,6 +40,8 @@
 	if they specified it by hand
 
 	a bit more detail on svyciprop(type="xlogit") (from Ben Schneider)
+
+	Bell-McCaffrey standard errors (from Stas Kolenikov)
 	
 
 4.4-3	options(survey.lonely.psu="adjust") needed strata to be a factor or numeric

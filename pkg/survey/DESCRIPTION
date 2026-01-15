@@ -2,7 +2,7 @@ Package: survey
 Title: Analysis of Complex Survey Samples
 Description: Summary statistics, two-sample tests, rank tests, generalised linear models, cumulative link models, Cox models, loglinear models, and general maximum pseudolikelihood estimation for multistage stratified, cluster-sampled, unequally weighted survey samples. Variances by Taylor series linearisation or replicate weights. Post-stratification, calibration, and raking. Two-phase and multiphase subsampling designs. Graphics. PPS sampling without replacement. Small-area estimation. Dual-frame designs.
 Version: 4.5
-Author: Thomas Lumley, Peter Gao, Ben Schneider
+Author: Thomas Lumley, Peter Gao, Ben Schneider, Stas Kolenikov
 Maintainer: "Thomas Lumley" <t.lumley@auckland.ac.nz>
 License: GPL-2 | GPL-3
 Depends: R (>= 4.1.0), grid, methods, Matrix, survival
@@ -25,4 +25,4 @@ Suggests:
     testthat (>= 3.0.0)
 URL: http://r-survey.r-forge.r-project.org/survey/
 Config/testthat/edition: 3
-NeedsCompilation: yes
+NeedsCompilation: yes
