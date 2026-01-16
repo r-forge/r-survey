@@ -817,7 +817,7 @@ svyvar.svyrep.design<-svrepvar<-function(x, design, na.rm=FALSE, rho=NULL,
   repvars<-apply(wts,2, v)
   
   repvars<-drop(t(repvars))
-  attr(rval,"var")<-svrVar(repvars, scale, rscales,mse=design$mse, coef=rval)
+  attr(rval,"var")<-svrVar(repvars, scale, rscales,mse=design$mse, coef=as.vector(rval))
   attr(rval, "statistic")<-"variance"
   if (return.replicates){
     attr(repvars,"scale")<-design$scale

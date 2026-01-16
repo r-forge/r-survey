@@ -42,6 +42,11 @@
 	a bit more detail on svyciprop(type="xlogit") (from Ben Schneider)
 
 	Bell-McCaffrey standard errors (from Stas Kolenikov)
+
+	remove spurious warning in svyvar for replicate-weights with mse=TRUE
+	(Ben Schneider)
+
+	change deprecated arma::is_finite to standard::isfinite
 	
 
 4.4-3	options(survey.lonely.psu="adjust") needed strata to be a factor or numeric
