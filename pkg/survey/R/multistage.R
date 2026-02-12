@@ -18,9 +18,40 @@ detibble<-function(data) {
 
 svydesign.default<-function(ids,probs=NULL,strata=NULL,variables=NULL, fpc=NULL,
                     data=NULL, nest=FALSE, check.strata=!nest,weights=NULL,pps=FALSE,
-                            calibrate.formula=NULL,variance=c("HT","YG"), ...){
+                    calibrate.formula=NULL,variance=c("HT","YG"),
+                    na_weights=c("fail","warn","allow"), ...){
 
-  data<-detibble(data)
+    na.failsafe<-function(message="missing values in object"){
+      function(object,...){
+        if (NCOL(object)==0)
+          object
+        else {
+          ok <- complete.cases(object)
+          if (all(ok)) 
+            object
+          else stop(message)
+        }
+      }
+    }
+    
+    data<-detibble(data)
+
+    ## drop records with NA weights if that's what the user asks for
+    na_weights<-match.arg(na_weights)
+    if(inherits(weights,"formula")){
+        mf<-substitute(model.frame(weights, data=data, na.action=na.pass))
+        pre_weights<-eval.parent(mf)
+    } else if (!is.null(weights)) {
+        pre_weights<-data.frame(weights)
+    } else pre_weights<-rep(1,nrow(data))
+    if (any(is.na(pre_weights))){
+        if (na_weights=="fail"){
+            stop("missing values in weights and na_weights='fail'")
+        } else if(na_weights=="warn"){
+            warning("missing values in weights; records will be dropped")
+        }
+        data<-data[!is.na(pre_weights),]
+    }
     
   variance<-match.arg(variance)
   if(is.character(pps)){
@@ -54,18 +85,6 @@ svydesign.default<-function(ids,probs=NULL,strata=NULL,variables=NULL, fpc=NULL,
         
     }
 
-    na.failsafe<-function(message="missing values in object"){
-      function(object,...){
-        if (NCOL(object)==0)
-          object
-        else {
-          ok <- complete.cases(object)
-          if (all(ok)) 
-            object
-          else stop(message)
-        }
-      }
-    }
 
      na.id<-na.failsafe("missing values in `id'")
      if(inherits(ids,"formula")) {
@@ -91,6 +110,7 @@ svydesign.default<-function(ids,probs=NULL,strata=NULL,variables=NULL, fpc=NULL,
       mf<-substitute(model.frame(probs,data=data,na.action=na.prob))
       probs<-eval.parent(mf)
     }
+
 
     na.weight<-na.failsafe("missing values in `weights'")
     if(inherits(weights,"formula")){
