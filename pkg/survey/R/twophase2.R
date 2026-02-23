@@ -96,11 +96,11 @@ oldDcheck_multi_subset<-function(id,strata,subset,probs,withreplacement){
 }
 
 
-Dcheck_multi_subset<-function(id,strata,subset,probs,withreplacement){
+Dcheck_multi_subset<-function(id,strata,subset,probs,withreplacement,phase1_is_iid){
    nstage<-NCOL(id)
    n<-sum(subset)
    rval<-matrix(0,n,n)
-   if (all(probs==1) && withreplacement)
+   if (phase1_is_iid)
        return(as(diag(n),"sparseMatrix"))
    sampsize<-NULL
    for(stage in 1:nstage){
@@ -126,7 +126,8 @@ make_covmat<-function(design1,design2,subset){
     else{
         withreplacement<-is.null(design1$fpc$popsize)
         phase1<-Dcheck_multi_subset(design1$cluster, design1$strata, subset,
-                                    design1$allprob, withreplacement)
+                                    design1$allprob, withreplacement,
+                                    design1$phase1_is_iid)
     }
     if (!is.null(design2$dcheck))
         phase2<-design2$dcheck[[1]]$dcheck
@@ -153,10 +154,12 @@ twophase2<-function(id,strata=NULL, probs=NULL, fpc=NULL, pps=NULL,
         pps2<-pps[[2]]
     }
 
+    phase1_nulls<-is.null(probs[[1]]) && is.null(strata[[1]]) && is.null(fpc)[[1]] 
     
   d1<-svydesign(ids=id[[1]],strata=strata[[1]],weights=NULL,
                 probs=probs[[1]],fpc=fpc[[1]],data=data)
 
+    d1$phase1_is_iid<-phase1_nulls && !any(duplicated(d1$cluster[,1]))
   if(inherits(subset,"formula"))
     subset<-eval.parent(model.frame(subset,data=data,na.action=na.pass))[[1]]
 
