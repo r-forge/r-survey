@@ -37,7 +37,7 @@ specified level.
 J. N. K. Rao and Alastair J. Scott (1984). On Chi-squared Tests For
   Multiway Contigency Tables with Proportions Estimated From Survey
   Data. Annals of Statistics 12:46-60.
-  \url{https://doi.org/10.1214/AOS/1176346391}
+  
 
 Robert M. Bell and Daniel F. McCaffrey (2002).
   Bias Reduction in Standard Errors for Linear Regression with

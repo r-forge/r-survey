@@ -90,7 +90,7 @@ Williams RL (1995) "Product-Limit Survival Functions with Correlated
 Survival Times" Lifetime Data Analysis 1: 171--186
 
 }
-\seealso{  \code{\link{coxph}}, \code{\link{predict.coxph}}
+\seealso{  \code{\link[survival]{coxph}}, \code{\link[survival]{predict.coxph}}
 
   \code{\link{svykm}} for estimation of Kaplan-Meier survival curves and
   for methods that operate on survival curves.

@@ -356,6 +356,7 @@ S3method(degf, twophase2)
 S3method(degf, svystat)
 S3method(degf, svrepstat)
 S3method("degf<-", svyrep.design)
+S3method("degf<-", default)
 
 S3method(cv,default)
 S3method(cv,svyratio)
@@ -568,6 +569,7 @@ S3method(svychisq, multiframe)
 S3method(update, multiframe)
 
 S3method(reweight, dualframe)
+S3method(reweight, multiframe)
 S3method(plot, dualframe_with_rewt)
 S3method(coef, dualframe_with_rewt)
 
