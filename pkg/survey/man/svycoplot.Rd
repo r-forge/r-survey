@@ -20,7 +20,7 @@ svycoplot(formula, design, style = c("hexbin", "transparent"), basecol =
   \item{alpha}{Minimum and maximum opacity }
   \item{hexscale}{Scale hexagons separate for each panel (relative) or
     across all panels (absolute)}
-  \item{\dots}{Other arguments passed to \code{grid.hexagons} or \code{\link{xyplot}} }
+  \item{\dots}{Other arguments passed to \code{grid.hexagons} or \code{xyplot} }
 }
 
 \value{
@@ -31,7 +31,7 @@ As with all 'Trellis' graphs, this function creates an object but does
   not draw the graph. When used inside a function or non-interactively
   you need to \code{print()} the result to create the graph.
 }
-\seealso{\code{{svyplot}}}
+\seealso{\code{svyplot}}
 \examples{
 data(api)
 dclus2<-svydesign(id=~dnum+snum,  weights=~pw,
