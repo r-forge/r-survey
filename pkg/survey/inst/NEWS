@@ -1,3 +1,6 @@
+4.5-2   calibrate(twophase, formula=fitted_model,phase=2) was putting the calibration
+        std error information in the wrong place and overestimating standard errors
+
 4.5	start of first version of multiphase() for arbitrary multiphase sampling
 	(experimental, may contain nuts)
 

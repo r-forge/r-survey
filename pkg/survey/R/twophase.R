@@ -813,7 +813,7 @@ inf_calibrate<-function(design, working_model,add_mat=NULL, calfun, bounds=list(
     design$prob <- design$prob/g
     caldata <- list(qr = tqr, w = g * whalf, stage = 0, index = NULL)
     class(caldata) <- c("greg_calibration", "gen_raking")
-    design$postStrata <- c(design$postStrata, list(caldata))
+    design$phase2$postStrata <- c(design$postStrata, list(caldata))
     design$call <- sys.call()
     design
 }
