@@ -1,3 +1,7 @@
+2.7 NEWS file renamed because CRAN requires a specific format for that name
+
+2.6 Authors@R now compulsory, fix a typo in withPV.Rd
+
 2.5 fix action=function, rewrite=TRUE case of withPV
 
 2.4 Add support for 'plausible values', ie, imputations of a small number

@@ -11,7 +11,7 @@ set, returning a list suitable for \code{MIcombine}. That is, the data
 set contains some sets of columns where each set are multiple
 imputations of the same variable. With
 \code{rewrite=TRUE}, the \code{action} is rewritten to reference each
-plausible value in turn; with code{rewrite=FALSE} a new data set is
+plausible value in turn; with \code{rewrite=FALSE} a new data set is
 constructed for each plausible value, which is slower but more general.
 }
 \usage{
